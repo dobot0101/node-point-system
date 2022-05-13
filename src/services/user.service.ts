@@ -1,7 +1,7 @@
-import { timeStamp } from 'console';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entity/user.entity';
+import bcrypt from 'bcrypt';
 
 export class UserService {
   private users: User[] = [];
@@ -14,13 +14,30 @@ export class UserService {
     return this.users.find(user => user.id === id);
   }
 
-  create(userData: CreateUserDto) {
+  async signUp(userData: CreateUserDto) {
+    const { email, name, password } = userData;
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user: User = {
       id: this.users.length + 1,
-      ...userData,
+      email,
+      name,
+      password: hashedPassword,
     };
     this.users.push(user);
     return user;
+  }
+
+  async login(email: string, password: string) {
+    const user = this.users.find(user => user.email === email);
+    if (user) {
+      const isPasswordMatched = await bcrypt.compare(password, user.password);
+      if (isPasswordMatched) {
+        return user;
+      }
+      throw new Error('invalid password');
+    } else {
+      throw new Error(`can't find user`);
+    }
   }
 
   deleteOne(id: number) {

@@ -30,9 +30,32 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.post('/', (req, res) => {
-  const createdUser = userService.create(req.body);
-  res.status(201).send(createdUser);
+router.post('/new', async (req, res) => {
+  try {
+    const { email, name, password } = req.body;
+    if (!email || !name || !password) {
+      throw new Error(`request body error`);
+    }
+    const createdUser = await userService.signUp(req.body);
+    res.status(201).json({ createdUser });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await userService.login(email, password);
+    console.log(user);
+    res.status(200).json({ user });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
 });
 
 router.delete('/:id', (req, res) => {
