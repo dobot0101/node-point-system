@@ -1,7 +1,7 @@
 {
-  "name": "node-point-system",
+  "name": "node-aith",
   "version": "1.0.0",
-  "description": "point system",
+  "description": "study authentication using node express",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
