@@ -1,3 +1,4 @@
+import { RowDataPacket } from 'mysql';
 import { CreatePointDto } from '../dto/create-point.dto';
 import { EventData } from '../dto/review-event.dto';
 import { PointModel } from '../models/point.model';
@@ -7,7 +8,11 @@ const pointModel = new PointModel();
 const reviewModel = new ReviewModel();
 
 export class PointService {
-  async add(data: EventData): Promise<boolean> {
+  async getTotalPoints(userId: string) {
+    return await pointModel.getTotalByUserId(userId);
+  }
+  
+  async create(data: EventData): Promise<boolean> {
     try {
       // 1. 텍스트 리뷰 포인트 지급
       const createPointData: CreatePointDto = {
@@ -65,11 +70,16 @@ export class PointService {
 
     return true;
   }
-  async delete(data: EventData): Promise<boolean> {
-    // 사용하지 않은 포인트 가져오기
-    const points = await pointModel.findUnusedByReviewId(data.reviewId);
 
-    const results = await Promise.all(
+  async delete(data: EventData): Promise<boolean> {
+    // 리뷰를 삭제하면 사용하지 않은 포인트 취소
+    const points = (await pointModel.findUnusedByReviewId(
+      data.reviewId
+    )) as RowDataPacket[];
+
+    console.log(points);
+
+    const results = Promise.all(
       points.map(point => {
         return pointModel.create({
           amount: -1,
@@ -80,7 +90,7 @@ export class PointService {
       })
     );
 
-    console.log(results);
+    console.log({ results });
 
     return true;
   }
