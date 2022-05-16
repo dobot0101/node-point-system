@@ -9,9 +9,10 @@ const reviewModel = new ReviewModel();
 
 export class PointService {
   async getTotalPoints(userId: string) {
-    return await pointModel.getTotalByUserId(userId);
+    return await pointModel.getTotalPointByUserId(userId);
   }
-  
+
+  // async create(data: EventData): Promise<boolean> {
   async create(data: EventData): Promise<boolean> {
     try {
       // 1. 텍스트 리뷰 포인트 지급
@@ -37,60 +38,72 @@ export class PointService {
         await pointModel.create(createPointData);
       }
     } catch (error) {
-      console.log(error);
-      throw error;
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
 
     return true;
   }
 
   async modify(data: EventData): Promise<boolean> {
-    // 1. 사진 첨부 포인트를 받은적이 없는데 사진을 첨부한 경우 포인트 지급
-    const existsPhotoPoint = await pointModel.checkPhotoPointExists(
-      data.reviewId
-    );
+    try {
+      const isPhotoPointExists = await pointModel.existsPhotoPointByReviewId(
+        data.reviewId
+      );
 
-    if (data.attachedPhotoIds.length > 0 && !existsPhotoPoint) {
-      await pointModel.create({
-        amount: 1,
-        reviewType: 'PHOTO',
-        ...data,
-      });
-    } else if (existsPhotoPoint && data.attachedPhotoIds.length === 0) {
-      /**
-       * 2. 사진첨부 포인트를 받았는데, 첨부 사진을 모두 삭제한 경우 포인트 회수
-       * (포인트를 사용하지 않았으면 회수, 이미 사용했으면 회수 X)
-       */
-      await pointModel.create({
-        amount: -1,
-        reviewType: 'PHOTO',
-        ...data,
-      });
+      // 1. 사진을 첨부한 경우 PHOTO 포인트가 없으면 포인트 지급
+      if (data.attachedPhotoIds.length > 0 && !isPhotoPointExists) {
+        await pointModel.create({
+          amount: 1,
+          reviewType: 'PHOTO',
+          ...data,
+        });
+      } else if (data.attachedPhotoIds.length === 0 && isPhotoPointExists) {
+        /**
+         * 2. 첨부 사진이 없는 경우
+         * PHOTO 포인트를 지급 내역이 있고,
+         * 보유 포인트가 남아 있으면 포인트를 차감한다.
+         */
+        const point = await pointModel.getTotalPointByUserId(data.userId);
+        if (point > 0) {
+          await pointModel.create({
+            amount: -1,
+            reviewType: 'PHOTO',
+            ...data,
+          });
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
-
     return true;
   }
 
+  /**
+   * 리뷰 삭제 시 포인트 차감
+   */
   async delete(data: EventData): Promise<boolean> {
-    // 리뷰를 삭제하면 사용하지 않은 포인트 취소
-    const points = (await pointModel.findUnusedByReviewId(
+    const havingPoint = await pointModel.getTotalPointByUserId(data.userId);
+
+    const reviewPointToDelete = await pointModel.getTotalPointByReviewId(
       data.reviewId
-    )) as RowDataPacket[];
-
-    console.log(points);
-
-    const results = Promise.all(
-      points.map(point => {
-        return pointModel.create({
-          amount: -1,
-          reviewType: point.review_type,
-          userId: point.user_id,
-          reviewId: point.review_id,
-        });
-      })
     );
 
-    console.log({ results });
+    /**
+     * 보유 포인트가 삭제할 리뷰 포인트 보다 적은 경우를 대비해서,
+     * 보유 포인트와 리뷰 포인트 중 작은 값을 보유 포인트에서 뺀다.
+     */
+    const cancelPoint = Math.min(havingPoint, reviewPointToDelete);
+
+    await pointModel.create({
+      amount: cancelPoint * -1,
+      reviewId: data.reviewId,
+      reviewType: 'CANCEL_REVIEW',
+      userId: data.userId,
+    });
 
     return true;
   }

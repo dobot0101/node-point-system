@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { PointService } from '../services/point.service';
+import { CreateResult, PointService } from '../services/point.service';
 
-export class EventsController {
+export class PointController {
   async modifyPoint(req: Request, res: Response) {
     try {
       const { body } = req;
-      let result: boolean = false;
-
       const pointService = new PointService();
+      let result: CreateResult;
+
       switch (req.body.action) {
         case 'ADD':
           result = await pointService.create(body);
@@ -22,10 +22,10 @@ export class EventsController {
           throw new Error('invalid action');
       }
 
-      res.status(200).json({ success: result });
+      res.status(200).json(result);
     } catch (error) {
       if (error instanceof Error) {
-        res.status(500).json({ error: error.message });
+        res.status(400).json({ error: error.message });
       }
     }
   }

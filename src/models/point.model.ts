@@ -5,26 +5,32 @@ import { RowDataPacket } from 'mysql';
 import { query } from './db';
 
 export class PointModel {
+  async getTotalPointByReviewId(reviewId: string) {
+    const { rows } = await query(
+      `select review_id, ifnull(sum(amount), 0) as total_point 
+        from point 
+        where review_id = ? 
+        group by review_id`,
+      [reviewId]
+    );
+
+    return rows[0].total_point;
+  }
   /**
    * 회원 아이디로 포인트 내역 조회
    * @param userId 회원 아이디
    * @returns 포인트 내역
    */
-  async getTotalByUserId(userId: string) {
-    try {
-      const result = await query(
-        `select user_id, sum(amount) as total_point 
+  async getTotalPointByUserId(userId: string) {
+    const { rows } = await query(
+      `select user_id, ifnull(sum(amount), 0) as total_point 
         from point 
         where user_id = ? 
         group by user_id`,
-        [userId]
-      );
+      [userId]
+    );
 
-      return result.rows[0].total_point;
-    } catch (error) {
-      console.log(`getTotalByUserId error: ${error}`);
-      throw error;
-    }
+    return rows[0].total_point;
   }
 
   /**
@@ -41,9 +47,7 @@ export class PointModel {
       [id, userId, reviewId, reviewType, amount]
     );
 
-    console.log(result);
-
-    return result;
+    return result.rows;
   }
 
   /**
@@ -51,25 +55,21 @@ export class PointModel {
    * @param reviewId 리뷰 아이디
    * @returns PHOTO 포인트 지급 여부
    */
-  async checkPhotoPointExists(reviewId: string) {
-    const result = await query(
+  async hasPhotoPointByReviewId(reviewId: string) {
+    const { rows } = await query(
       `select count(*) as count from point where review_id = ? and review_type = 'PHOTO'`,
       [reviewId]
     );
-    console.log(result);
-    return result;
+
+    return rows[0].count;
   }
 
-  /**
-   * 리뷰 아이디로 사용되지 않은 포인트 조회
-   * @param reviewId 리뷰 아이디
-   * @returns 조회결과 rows
-   */
-  async findUnusedByReviewId(reviewId: string) {
-    const result = await query(
-      `select * from point where review_id = ? and is_used = false`,
+  async existsPhotoPointByReviewId(reviewId: string) {
+    const { rows } = await query(
+      `select ifnull(sum(amount), 0) amount from point where review_type = ‘PHOTO’ and review_id = ?`,
       [reviewId]
     );
-    return result.rows;
+
+    return rows[0].amount > 0;
   }
 }
