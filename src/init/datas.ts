@@ -1,3 +1,5 @@
+import { convertUUIDOfObject } from '../utils/uuid';
+
 export const datas = {
   type: 'REVIEW',
   action: 'ADD',
@@ -10,3 +12,5 @@ export const datas = {
   userId: '3ede0ef2-92b7-4817-a5f3-0c575361f745',
   placeId: '2e4baf1c-5acb-4efb-a1af-eddada31b00f',
 };
+
+convertUUIDOfObject(datas);

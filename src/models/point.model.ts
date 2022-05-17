@@ -5,6 +5,9 @@ import { RowDataPacket } from 'mysql';
 import { query } from './db';
 
 export class PointModel {
+  /**
+   * 포인트 합계 조회
+   */
   async getTotalPointByReviewId(reviewId: string) {
     const { rows } = await query(
       `select review_id, ifnull(sum(amount), 0) as total_point 
@@ -14,12 +17,29 @@ export class PointModel {
       [reviewId]
     );
 
+    if (rows.length === 0) {
+      return 0;
+    }
+
     return rows[0].total_point;
   }
+
+  /**
+   * 포인트 내역 조회
+   */
+  async getPointListByUserId(userId: string) {
+    const { rows } = await query(
+      `select * from point where user_id = ? order by created_at desc`,
+      [userId]
+    );
+
+    // console.log(`select * from point where user_id = '${userId}'' order by created_at desc`);
+
+    return rows;
+  }
+
   /**
    * 회원 아이디로 포인트 내역 조회
-   * @param userId 회원 아이디
-   * @returns 포인트 내역
    */
   async getTotalPointByUserId(userId: string) {
     const { rows } = await query(
@@ -30,13 +50,15 @@ export class PointModel {
       [userId]
     );
 
+    if (rows.length === 0) {
+      return 0;
+    }
+
     return rows[0].total_point;
   }
 
   /**
-   * 포인트 데이터를 저장하는 함수
-   * @param data 포인트 데이터를 저장하기 위한 데이터 객체
-   * @returns 저장 결과
+   * 포인트 적립
    */
   async create(data: CreatePointDto) {
     const { amount, userId, reviewId, reviewType } = data;
@@ -51,19 +73,8 @@ export class PointModel {
   }
 
   /**
-   * 특정 리뷰를 작성하여 PHOTO 포인트를 지급받은 적이 잇는지 확인
-   * @param reviewId 리뷰 아이디
-   * @returns PHOTO 포인트 지급 여부
+   * 리뷰 아이디로 포토 리뷰 포인트 받았는지 확인
    */
-  async hasPhotoPointByReviewId(reviewId: string) {
-    const { rows } = await query(
-      `select count(*) as count from point where review_id = ? and review_type = 'PHOTO'`,
-      [reviewId]
-    );
-
-    return rows[0].count;
-  }
-
   async existsPhotoPointByReviewId(reviewId: string) {
     const { rows } = await query(
       `select ifnull(sum(amount), 0) amount from point where review_type = ‘PHOTO’ and review_id = ?`,

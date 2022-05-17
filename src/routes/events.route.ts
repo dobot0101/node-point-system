@@ -1,11 +1,10 @@
 import express from 'express';
-import { PointController } from '../contollers/point.controller';
+import { EventController } from '../contollers/event.controller';
 
 const router = express.Router();
 
-const eventsController = new PointController();
+const eventController = new EventController();
 
-router.post('/point', eventsController.modifyPoint);
-router.get('/point/:id', eventsController.getTotalPoint);
+router.post('/', eventController.updatePoint);
 
 export default router;

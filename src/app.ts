@@ -7,43 +7,42 @@ dotenv.config({
 });
 
 import events from './routes/events.route';
+import point from './routes/point.route';
 import { createTables, dropTables, initData } from './init/init';
 import { connectDB } from './models/db';
-import jwt from 'jsonwebtoken';
+import jwt from './utils/jwt';
+import { auth } from './middleware/auth';
+import { convertUUIDToUseIndex } from './middleware/convertReqValue';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
-connectDB();
+async function main() {
+  connectDB();
+  // DB 테이블 전체 삭제를 원할 시 아래 코드 주석 해제
+  await dropTables();
+  // DB 테이블 전체 생성을 원하면 아래 코드 주석 해제
+  await createTables();
+  // 데이터 초기화 시 주석 해제
+  await initData();
 
-// DB 테이블 전체 삭제를 원할 시 아래 코드 주석 해제
-// dropTables();
+  const accessToken = jwt.sign({
+    email: 'test@email.com',
+    password: 'testpassword',
+  });
 
-// DB 테이블 전체 생성을 원하면 아래 코드 주석 해제
-// createTables();
+  console.log({ accessToken });
 
-// 데이터 초기화 시 주석 해제
-// initData();
+  app.use(express.json());
+  app.use('/events', auth, convertUUIDToUseIndex, events);
+  app.use('/point', auth, point);
 
-function createAuthToken(email: string, password: string) {
-  try {
-    const jwtSecret = process.env.JWT_SECRET || 'funnynode';
-    const token = jwt.sign({ email, password }, jwtSecret, {
-      expiresIn: '1d',
-    });
-
-    return token;
-  } catch (error: any) {
-    console.log(error);
-    process.exit();
-  }
+  app.listen(port, () => {
+    console.log(`listening on port ${port}`);
+  });
 }
 
-createAuthToken('test@email.com', 'test_password');
-
-app.use(express.json());
-app.use('/events', events);
-
-app.listen(port, () => {
-  console.log(`listening on port ${port}`);
+main().catch(err => {
+  console.error(err);
+  process.exit();
 });

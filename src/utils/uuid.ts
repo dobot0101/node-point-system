@@ -1,7 +1,8 @@
+import uuid4 from 'uuid4';
 import v4 from 'uuid4';
 
 function generateUUID(): string {
-  return v4();
+  return convertUUID(v4());
 }
 
 /**
@@ -15,4 +16,27 @@ function convertUUID(uuid: string) {
   return tokens[2] + tokens[1] + tokens[0] + tokens[3] + tokens[4];
 }
 
-export { generateUUID, convertUUID };
+interface ConvertTargetObject {
+  [key: string]: any;
+}
+
+function convertUUIDOfObject(object: ConvertTargetObject) {
+  for (const [key, val] of Object.entries(object)) {
+    if (val) {
+      if (typeof val === 'string' && uuid4.valid(val)) {
+        object[key] = convertUUID(val);
+        continue;
+      }
+
+      if (Array.isArray(val)) {
+        const convertedArr = val.map(item => {
+          return uuid4.valid(item) ? convertUUID(item) : item;
+        });
+        object[key] = convertedArr;
+        continue;
+      }
+    }
+  }
+}
+
+export { generateUUID, convertUUID, convertUUIDOfObject };

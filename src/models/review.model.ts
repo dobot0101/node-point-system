@@ -1,7 +1,7 @@
 import { query } from './db';
 
 export class ReviewModel {
-  async checkIfFirstReviewOfPlace(placeId: string) {
+  async isFirstReviewOfPlace(placeId: string) {
     const result = await query(
       `select count(*) as count from review where place_id = ?`,
       [placeId]
