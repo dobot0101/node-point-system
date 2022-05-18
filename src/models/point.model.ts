@@ -75,9 +75,9 @@ export class PointModel {
   /**
    * 리뷰 아이디로 포토 리뷰 포인트 받았는지 확인
    */
-  async existsPhotoPointByReviewId(reviewId: string) {
+  async checkIfGivenPhotoPointByReviewId(reviewId: string) {
     const { rows } = await query(
-      `select ifnull(sum(amount), 0) amount from point where review_type = ‘PHOTO’ and review_id = ?`,
+      `select ifnull(sum(amount), 0) amount from point where review_type = 'PHOTO' and review_id = ?`,
       [reviewId]
     );
 

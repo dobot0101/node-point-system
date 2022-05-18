@@ -19,7 +19,6 @@ export async function initData() {
       ]),
       query(`insert into place (id) values (?)`, [datas.placeId]),
     ]);
-    console.log(results);
     console.log(`initialize data 완료`);
   } catch (error) {
     console.log(`initData error: ${error}`);

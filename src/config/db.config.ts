@@ -1,3 +1,10 @@
+import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config({
+  path: path.join(__dirname, '../..', '/secret.env'),
+});
+
 const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,

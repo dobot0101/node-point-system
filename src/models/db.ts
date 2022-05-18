@@ -1,4 +1,3 @@
-import { RowDataPacket } from 'mysql';
 import mysql from 'mysql2/promise';
 import dbConfig from '../config/db.config';
 
@@ -10,7 +9,20 @@ export function connectDB() {
     console.log('DB 연결 성공');
   } catch (error) {
     console.log(`DB 연결 중 에러: ${error}`);
-    console.log(error);
+  }
+}
+
+export function getConnection() {
+  if (!pool) {
+    connectDB();
+    return pool;
+  }
+  return pool;
+}
+
+export async function closeConnection() {
+  if (pool) {
+    pool.end();
   }
 }
 

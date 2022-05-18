@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { exit } from 'process';
 const secret = process.env.JWT_SECRET;
 
 type JwtPayload = {
@@ -9,27 +10,32 @@ type JwtPayload = {
 /**
  * access token 검증
  */
-function verify(token: string) {
+type VerifyReturn = {
+  success: boolean;
+  email?: string;
+  password?: string;
+  error?: string;
+};
+
+function verify(token: string): VerifyReturn {
+  const result: VerifyReturn = {
+    success: false,
+  };
   try {
     if (!secret) {
-      throw new Error(`jwt secret isn't exist`);
+      throw new Error(`jwt secret이 존재하지 않습니다.`);
     }
 
     const decoded = jwt.verify(token, secret) as JwtPayload;
-
-    return {
-      success: true,
-      email: decoded.email,
-      password: decoded.password,
-    };
+    result.success = true;
+    result.email = decoded.email;
+    result.password = decoded.password;
   } catch (err) {
-    if (err instanceof Error) {
-      return {
-        success: false,
-        message: err.message,
-      };
-    }
+    const error = err as Error;
+    result.success = false;
+    result.error = error.message;
   }
+  return result;
 }
 
 /**
