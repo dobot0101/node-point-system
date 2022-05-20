@@ -1,16 +1,17 @@
 import request from 'supertest';
 import { app } from '../app';
-import { createTables, dropTables, initData } from '../init/init';
-import { closeConnection, connectDB, getConnection } from '../models/db';
+import {
+  createIndexes,
+  createTables,
+  createTestDB,
+  dropIndexes,
+  dropTables,
+  initData,
+} from '../init/init';
+import { connectTestDB } from '../models/db';
+
 import jwt from '../utils/jwt';
 import { convertUUID } from '../utils/uuid';
-
-beforeAll(async () => {
-  connectDB();
-  await dropTables();
-  await createTables();
-  await initData();
-});
 
 // 인증 토큰 생성
 const token = jwt.sign({
@@ -20,8 +21,15 @@ const token = jwt.sign({
 
 const userId = convertUUID('3ede0ef2-92b7-4817-a5f3-0c575361f745');
 
-describe(`포인트 조회 API 테스트`, () => {
-  test('보유 포인트 합계를 조회한다.', async () => {
+describe(`point search API test`, () => {
+  beforeAll(async () => {
+    connectTestDB();
+    await createTables();
+    await createIndexes();
+    await initData();
+  });
+
+  it('should return total point', async () => {
     const res = await request(app)
       .get(`/point/total/${userId}`)
       .set('Authorization', token);
@@ -32,7 +40,7 @@ describe(`포인트 조회 API 테스트`, () => {
     expect(parseInt(totalPoint)).toBeGreaterThanOrEqual(0);
   });
 
-  test('보유 포인트 목록을 조회한다.', async () => {
+  it('should return point list', async () => {
     const res = await request(app)
       .get(`/point/list/${userId}`)
       .set('Authorization', token);
@@ -41,5 +49,10 @@ describe(`포인트 조회 API 테스트`, () => {
 
     expect(success).toBe(true);
     expect(pointList.length).toBeGreaterThanOrEqual(0);
+  });
+
+  afterAll(async () => {
+    await dropIndexes();
+    await dropTables();
   });
 });

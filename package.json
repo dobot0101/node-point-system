@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test:detect": "jest --forceExit --detectOpenHandles",
-    "test": "jest --forceExit",
+    "test": "jest --forceExit --runInBand --coverage",
     "test:w": "npx jest --watch",
     "start": "node dist/server.js",
     "dev": "tsc --watch --preserveWatchOutput & nodemon --enable-source-maps -w dist/ --delay 500ms dist/server.js"

@@ -20,7 +20,6 @@ export class PointController {
       const { userId } = req.params;
       const pointService = new PointService();
       const pointList = await pointService.getPointList(userId);
-      // console.log({pointList})
       res.status(200).json({ success: true, pointList });
     } catch (error) {
       if (error instanceof Error) {

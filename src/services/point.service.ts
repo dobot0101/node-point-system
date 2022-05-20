@@ -1,5 +1,5 @@
 import { CreatePointDto } from '../dto/create-point.dto';
-import { EventData } from '../dto/review-event.dto';
+import { ReviewEventDto } from '../dto/review-event.dto';
 import { PointModel } from '../models/point.model';
 import { ReviewModel } from '../models/review.model';
 
@@ -7,7 +7,7 @@ const pointModel = new PointModel();
 const reviewModel = new ReviewModel();
 
 export class PointService {
-  async create(data: EventData): Promise<boolean> {
+  async create(data: ReviewEventDto): Promise<boolean> {
     // 1. 텍스트 리뷰 포인트 지급
     const createPointData: CreatePointDto = {
       reviewType: 'TEXT',
@@ -34,7 +34,7 @@ export class PointService {
     return true;
   }
 
-  async modify(data: EventData): Promise<boolean> {
+  async modify(data: ReviewEventDto): Promise<boolean> {
     const isPhotoPointGiven = await pointModel.checkIfGivenPhotoPointByReviewId(
       data.reviewId
     );
@@ -68,7 +68,7 @@ export class PointService {
   /**
    * 리뷰 삭제 시 포인트 차감
    */
-  async delete(data: EventData): Promise<boolean> {
+  async delete(data: ReviewEventDto): Promise<boolean> {
     const havingPoint = await pointModel.getTotalPointByUserId(data.userId);
     const reviewPointToDelete = await pointModel.getTotalPointByReviewId(
       data.reviewId
@@ -103,7 +103,7 @@ export class PointService {
   /**
    * 특정 유저의 포인트 합계
    */
-  async getTotalPoint(userId: string) {
+  async getTotalPoint(userId: string): Promise<number> {
     return await pointModel.getTotalPointByUserId(userId);
   }
 }

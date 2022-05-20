@@ -1,6 +1,14 @@
 import { query } from '../models/db';
 import { datas } from './datas';
 
+export async function createTestDB() {
+  return await query(`create database point_test`);
+}
+
+export async function dropTestDB() {
+  return await query(`drop database point_test`);
+}
+
 export async function initData() {
   try {
     const results = await Promise.all([
@@ -19,7 +27,7 @@ export async function initData() {
       ]),
       query(`insert into place (id) values (?)`, [datas.placeId]),
     ]);
-    console.log(`initialize data 완료`);
+    console.log(`data init complete`);
   } catch (error) {
     console.log(`initData error: ${error}`);
     throw error;
@@ -35,10 +43,10 @@ export async function dropTables() {
       query(`drop table if exists review_photo`),
       query(`drop table if exists point`),
     ]);
-    console.log(`drop tables 완료`);
+    console.log(`tables drop complete`);
     return true;
   } catch (error) {
-    console.log(`drop tables error: ${error}`);
+    console.log(`tables drop error: ${error}`);
     throw error;
   }
 }
@@ -77,17 +85,38 @@ export async function createTables() {
       amount int not null,
       created_at datetime not null default current_timestamp
     )`),
-
-      query(`create index idx_userid on point (user_id)`),
-      query(`create index idx_reviewid on point (review_id)`),
-      query(`create index idx_placeid on review (place_id)`),
     ];
 
     const results = await Promise.all(promises);
-    console.log('create tables 완료');
+
+    console.log('table create complete');
     return true;
   } catch (error) {
-    console.log(`create tables error: ${error}`);
+    console.log(`table create error: ${error}`);
     throw error;
   }
+}
+
+export async function createIndexes() {
+  const promises = [
+    query(`create index idx_userid on point (user_id)`),
+    query(`create index idx_reviewid on point (review_id)`),
+    query(`create index idx_placeid on review (place_id)`),
+  ];
+
+  const result = await Promise.all(promises);
+  console.log(`create index complete`);
+  return result;
+}
+
+export async function dropIndexes() {
+  const promises = [
+    query(`alter table point drop index idx_userid`),
+    query(`alter table point drop index idx_reviewid`),
+    query(`alter table review drop index idx_placeid`),
+  ];
+
+  const result = await Promise.all(promises);
+  console.log('drop index complete');
+  return result;
 }

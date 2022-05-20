@@ -1,4 +1,4 @@
-export class EventData {
+export class ReviewEventDto {
   type!: string;
   action!: string;
   reviewId!: string;
