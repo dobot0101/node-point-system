@@ -1,55 +1,26 @@
 import jwt from 'jsonwebtoken';
-import { exit } from 'process';
 const secret = process.env.JWT_SECRET;
 
-type JwtPayload = {
+type JwtSignPayload = {
   email: string;
   password: string;
 };
 
-/**
- * access token 검증
- */
-type VerifyReturn = {
-  success: boolean;
-  email?: string;
-  password?: string;
-  error?: string;
-};
-
-function verify(token: string): VerifyReturn {
-  const result: VerifyReturn = {
-    success: false,
-  };
-  try {
-    if (!secret) {
-      throw new Error(`jwt secret이 존재하지 않습니다.`);
-    }
-
-    const decoded = jwt.verify(token, secret) as JwtPayload;
-    result.success = true;
-    result.email = decoded.email;
-    result.password = decoded.password;
-  } catch (err) {
-    const error = err as Error;
-    result.success = false;
-    result.error = error.message;
+function verify(token: string) {
+  if (!secret) {
+    throw new Error(`JWT secret isn't exist`);
   }
-  return result;
+  const decoded = jwt.verify(token, secret);
+  return decoded;
 }
 
 /**
  * access token 발급
  */
-function sign(user: JwtPayload): string {
+function sign(payload: JwtSignPayload): string {
   if (!secret) {
     throw new Error(`jwt secret isn't exist`);
   }
-
-  const payload: JwtPayload = {
-    email: user.email,
-    password: user.password,
-  };
 
   return jwt.sign(payload, secret, {
     algorithm: 'HS256', // 암호화 알고리즘

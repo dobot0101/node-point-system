@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
+import { JwtPayload } from 'jsonwebtoken';
 import jwt from '../utils/jwt';
+
+interface JwtVerifyResult extends JwtPayload {
+  email: string;
+  password: string;
+}
 
 export function auth(req: Request, res: Response, next: NextFunction) {
   try {
@@ -7,23 +13,17 @@ export function auth(req: Request, res: Response, next: NextFunction) {
       throw new Error(`authorization isn't exist`);
     }
 
-    const decoded = jwt.verify(req.headers.authorization);
-    const { success, email, error, password } = decoded;
+    const decoded = jwt.verify(req.headers.authorization) as JwtVerifyResult;
 
-    if (success) {
-      if (!email) throw new Error('이메일이 존재하지 않습니다.');
-      if (!password) throw new Error('암호가 존재하지 않습니다.');
-      req.decoded = { success, email, password };
-      next();
-    } else if (error) {
-      throw new Error(error);
-    }
+    const { email, password } = decoded;
+    if (!email) throw new Error(`email isn't exist`);
+    if (!password) throw new Error(`password isn't exist`);
+
+    req.decoded = decoded;
+    next();
   } catch (error) {
+    console.log({ error });
     const err = error as Error;
-    const message =
-      err.name === 'TokenExpiredError'
-        ? '토큰이 만료되었습니다.'
-        : '코튼이 유효하지 않습니다.';
-    return res.status(403).json({ success: false, error: message });
+    return res.status(403).json({ success: false, error: err.message });
   }
 }
