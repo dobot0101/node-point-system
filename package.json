@@ -5,9 +5,10 @@
   "main": "server.js",
   "scripts": {
     "test:detect": "jest --forceExit --detectOpenHandles",
-    "test": "jest --forceExit --runInBand --coverage",
     "test:w": "npx jest --watch",
+    "build": "tsc",
     "start": "node dist/server.js",
+    "test": "jest --forceExit --runInBand --coverage",
     "dev": "tsc --watch --preserveWatchOutput & nodemon --enable-source-maps -w dist/ --delay 500ms dist/server.js"
   },
   "author": "",
