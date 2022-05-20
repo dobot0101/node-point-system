@@ -1,10 +1,9 @@
 import express from 'express';
 import { EventController } from '../contollers/event.controller';
-
-const router = express.Router();
+import { convertUUIDInRequestBody } from '../middleware/convertUUID';
 
 const eventController = new EventController();
-
-router.post('/', eventController.updatePoint);
+const router = express.Router();
+router.post('/', convertUUIDInRequestBody, eventController.updatePoint);
 
 export default router;

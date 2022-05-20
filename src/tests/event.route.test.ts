@@ -16,6 +16,8 @@ const attachedPhotoIds = [
   'afb0cef2-851d-4a50-bb07-9cc15cbdc332',
 ];
 
+const userId = '3ede0ef2-92b7-4817-a5f3-0c575361f745';
+
 // API 요청 데이터
 const data = {
   type: 'REVIEW',
@@ -32,8 +34,6 @@ const token = jwt.sign({
   email: 'test@email.com',
   password: 'testpassword',
 });
-
-const userId = convertUUID('3ede0ef2-92b7-4817-a5f3-0c575361f745');
 
 describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
   beforeAll(async () => {
@@ -52,7 +52,7 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
     data.attachedPhotoIds = attachedPhotoIds;
     await request(app)
       .post('/events')
-      .set('Authorization', token)
+      // .set('Authorization', token)
       .send(data)
       .expect(200, { success: true });
 
@@ -67,7 +67,7 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
     data.attachedPhotoIds = attachedPhotoIds;
     await request(app)
       .post('/events')
-      .set('Authorization', token)
+      // .set('Authorization', token)
       .send(data)
       .expect(200, { success: true });
 
@@ -76,7 +76,7 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
     data.attachedPhotoIds = [];
     await request(app)
       .post('/events')
-      .set('Authorization', token)
+      // .set('Authorization', token)
       .send(data)
       .expect(200, { success: true });
 
@@ -89,12 +89,18 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
     // 포토 리뷰 포인트 생성
     data.action = 'ADD';
     data.attachedPhotoIds = [];
-    await request(app).post('/events').set('Authorization', token).send(data);
+    await request(app)
+      .post('/events')
+      // .set('Authorization', token)
+      .send(data);
 
     // 포토 리뷰 포인트를 받은 리뷰의 사진을 삭제하여 포인트 회수
     data.action = 'MOD';
     data.attachedPhotoIds = attachedPhotoIds;
-    await request(app).post('/events').set('Authorization', token).send(data);
+    await request(app)
+      .post('/events')
+      // .set('Authorization', token)
+      .send(data);
 
     const res = await requestGetTotalPoint();
 
@@ -107,14 +113,14 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
     data.attachedPhotoIds = [];
     await request(app)
       .post('/events')
-      .set('Authorization', token)
+      // .set('Authorization', token)
       .send(data)
       .expect(200, { success: true });
 
     data.action = 'DELETE';
     await request(app)
       .post('/events')
-      .set('Authorization', token)
+      // .set('Authorization', token)
       .send(data)
       .expect(200, { success: true });
 
@@ -130,7 +136,6 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
 });
 
 async function requestGetTotalPoint() {
-  return await request(app)
-    .get(`/point/total/${userId}`)
-    .set('Authorization', token);
+  return await request(app).get(`/point/total/${userId}`);
+  // .set('Authorization', token);
 }
