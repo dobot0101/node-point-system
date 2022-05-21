@@ -1,5 +1,4 @@
 import { CreatePointDto } from '../dto/create-point.dto';
-// import { getConnection } from '../config/db';
 import { generateUUID } from '../utils/uuid';
 import { RowDataPacket } from 'mysql';
 import { getConnection, query } from './db';
@@ -10,11 +9,11 @@ export class PointModel {
    */
   async getTotalPointByReviewId(reviewId: string) {
     const rows = (await query(
-      `select review_id, ifnull(sum(amount), 0) as total_point 
+      `select source_id, ifnull(sum(amount), 0) as total_point 
         from point 
-        where review_id = ? 
-        group by review_id`,
-      [reviewId]
+        where source_id = ? and source_type = 'REVIEW'
+        group by source_id`,
+      [reviewId],
     )) as RowDataPacket[];
 
     if (rows.length === 0) {
@@ -28,10 +27,7 @@ export class PointModel {
    * 포인트 내역 조회
    */
   async getPointListByUserId(userId: string) {
-    const rows = await query(
-      `select * from point where user_id = ? order by created_at desc`,
-      [userId]
-    );
+    const rows = await query(`select * from point where user_id = ? order by created_at desc`, [userId]);
 
     return rows;
   }
@@ -45,7 +41,7 @@ export class PointModel {
         from point 
         where user_id = ? 
         group by user_id`,
-      [userId]
+      [userId],
     )) as RowDataPacket[];
 
     if (rows.length === 0) {
@@ -59,12 +55,12 @@ export class PointModel {
    * 포인트 적립
    */
   async create(data: CreatePointDto) {
-    const { amount, userId, reviewId, reviewType } = data;
+    const { amount, userId, sourceId, sourceType, memo } = data;
     const id = generateUUID();
 
     const rows = await query(
-      `insert into point (id, user_id, review_id, review_type, amount) values (?, ?, ?, ?, ?)`,
-      [id, userId, reviewId, reviewType, amount]
+      `insert into point (id, user_id, source_id, source_type, memo, amount) values (?, ?, ?, ?, ?, ?)`,
+      [id, userId, sourceId, sourceType, memo, amount],
     );
 
     return rows;
@@ -75,8 +71,8 @@ export class PointModel {
    */
   async checkIfGivenPhotoPointByReviewId(reviewId: string) {
     const rows = (await query(
-      `select ifnull(sum(amount), 0) amount from point where review_type = 'PHOTO' and review_id = ?`,
-      [reviewId]
+      `select ifnull(sum(amount), 0) amount from point where source_type = 'REVIEW' and source_id = ? and memo = 'PHOTO'`,
+      [reviewId],
     )) as RowDataPacket[];
 
     if (rows.length === 0) {
@@ -84,5 +80,16 @@ export class PointModel {
     }
 
     return rows[0].amount > 0;
+  }
+
+  /**
+   * 리뷰 아이디로 리뷰 작성 포인트 받았는지 확인
+   */
+  async checkIfGivenPointByReviewId(reviewId: string) {
+    const rows = (await query(`select count(*) as count from point where source_id = ?`, [
+      reviewId,
+    ])) as RowDataPacket[];
+
+    return rows[0].count > 0;
   }
 }

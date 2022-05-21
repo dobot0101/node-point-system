@@ -1,6 +1,7 @@
 export class CreatePointDto {
   userId!: string;
-  reviewId!: string;
-  reviewType!: string;
+  sourceType!: string;
+  sourceId!: string;
+  memo!: string;
   amount!: number;
 }

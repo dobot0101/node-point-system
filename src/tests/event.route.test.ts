@@ -1,20 +1,10 @@
 import request from 'supertest';
 import { app } from '../app';
-import {
-  createIndexes,
-  createTables,
-  dropIndexes,
-  dropTables,
-  initData,
-} from '../init/init';
+import { createTables, dropTables, initData } from '../init/init';
 import { connectTestDB, query } from '../models/db';
 import jwt from '../utils/jwt';
-import { convertUUID } from '../utils/uuid';
 
-const attachedPhotoIds = [
-  'e4d1a64e-a531-46de-88d0-ff0ed70c0bb8',
-  'afb0cef2-851d-4a50-bb07-9cc15cbdc332',
-];
+const attachedPhotoIds = ['e4d1a64e-a531-46de-88d0-ff0ed70c0bb8', 'afb0cef2-851d-4a50-bb07-9cc15cbdc332'];
 
 const userId = '3ede0ef2-92b7-4817-a5f3-0c575361f745';
 
@@ -39,7 +29,6 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
   beforeAll(async () => {
     connectTestDB();
     await createTables();
-    await createIndexes();
     await initData();
   });
 
@@ -130,7 +119,6 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
   });
 
   afterAll(async () => {
-    await dropIndexes();
     await dropTables();
   });
 });

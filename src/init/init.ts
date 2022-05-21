@@ -13,18 +13,14 @@ export async function initData() {
   try {
     const results = await Promise.all([
       query(`insert into user (id) values (?)`, [datas.userId]),
-      query(
-        `insert into review (id, user_id, place_id, content) values (?, ?, ?, ?)`,
-        [datas.reviewId, datas.userId, datas.placeId, datas.content]
-      ),
-      query(`insert into review_photo (id, review_id) values (?, ?)`, [
-        datas.attachedPhotoIds[0],
+      query(`insert into review (id, user_id, place_id, content) values (?, ?, ?, ?)`, [
         datas.reviewId,
+        datas.userId,
+        datas.placeId,
+        datas.content,
       ]),
-      query(`insert into review_photo (id, review_id) values (?, ?)`, [
-        datas.attachedPhotoIds[1],
-        datas.reviewId,
-      ]),
+      query(`insert into review_photo (id, review_id) values (?, ?)`, [datas.attachedPhotoIds[0], datas.reviewId]),
+      query(`insert into review_photo (id, review_id) values (?, ?)`, [datas.attachedPhotoIds[1], datas.reviewId]),
       query(`insert into place (id) values (?)`, [datas.placeId]),
     ]);
     console.log(`data init complete`);
@@ -68,7 +64,8 @@ export async function createTables() {
       place_id varchar(32) not null,
       content text not null,
       created_at datetime not null default current_timestamp,
-      modified_at datetime on update current_timestamp
+      modified_at datetime on update current_timestamp,
+      key idx_placeid (place_id)
     )`),
 
       query(`create table if not exists review_photo (
@@ -80,10 +77,13 @@ export async function createTables() {
       query(`create table if not exists point (
       id varchar(32) not null primary key,
       user_id varchar(32) not null,
-      review_type varchar(10), -- TEXT, PHOTO, BONUS
-      review_id varchar(32) not null, -- uuid
+      memo varchar(20), -- TEXT, PHOTO, BONUS
+      source_type varchar(20) not null,
+      source_id varchar(32) not null, -- uuid
       amount int not null,
-      created_at datetime not null default current_timestamp
+      created_at datetime not null default current_timestamp,
+      key idx_userid (user_id),
+      key idx_sourceid_sourcetype_memo (source_id, source_type, memo)
     )`),
     ];
 
@@ -97,26 +97,27 @@ export async function createTables() {
   }
 }
 
-export async function createIndexes() {
-  const promises = [
-    query(`create index idx_userid on point (user_id)`),
-    query(`create index idx_reviewid on point (review_id)`),
-    query(`create index idx_placeid on review (place_id)`),
-  ];
+// 위의 테이블 생성 시 인덱스를 같이 생성하도록 변경
+// export async function createIndexes() {
+//   const promises = [
+//     query(`create index idx_userid on point (user_id)`),
+//     query(`create index idx_reviewid on point (review_id)`),
+//     query(`create index idx_placeid on review (place_id)`),
+//   ];
 
-  const result = await Promise.all(promises);
-  console.log(`create index complete`);
-  return result;
-}
+//   const result = await Promise.all(promises);
+//   console.log(`create index complete`);
+//   return result;
+// }
 
-export async function dropIndexes() {
-  const promises = [
-    query(`alter table point drop index idx_userid`),
-    query(`alter table point drop index idx_reviewid`),
-    query(`alter table review drop index idx_placeid`),
-  ];
+// export async function dropIndexes() {
+//   const promises = [
+//     query(`alter table point drop index idx_userid`),
+//     query(`alter table point drop index idx_reviewid`),
+//     query(`alter table review drop index idx_placeid`),
+//   ];
 
-  const result = await Promise.all(promises);
-  console.log('drop index complete');
-  return result;
-}
+//   const result = await Promise.all(promises);
+//   console.log('drop index complete');
+//   return result;
+// }

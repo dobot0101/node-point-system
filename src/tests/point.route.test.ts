@@ -1,13 +1,6 @@
 import request from 'supertest';
 import { app } from '../app';
-import {
-  createIndexes,
-  createTables,
-  createTestDB,
-  dropIndexes,
-  dropTables,
-  initData,
-} from '../init/init';
+import { createTables, dropTables, initData } from '../init/init';
 import { connectTestDB } from '../models/db';
 
 import jwt from '../utils/jwt';
@@ -25,14 +18,11 @@ describe(`point search API test`, () => {
   beforeAll(async () => {
     connectTestDB();
     await createTables();
-    await createIndexes();
     await initData();
   });
 
   it('should return total point', async () => {
-    const res = await request(app)
-      .get(`/point/total/${userId}`)
-      .set('Authorization', token);
+    const res = await request(app).get(`/point/total/${userId}`).set('Authorization', token);
 
     const { success, totalPoint } = res.body;
 
@@ -41,9 +31,7 @@ describe(`point search API test`, () => {
   });
 
   it('should return point list', async () => {
-    const res = await request(app)
-      .get(`/point/list/${userId}`)
-      .set('Authorization', token);
+    const res = await request(app).get(`/point/list/${userId}`).set('Authorization', token);
 
     const { success, pointList } = res.body;
 
@@ -52,7 +40,6 @@ describe(`point search API test`, () => {
   });
 
   afterAll(async () => {
-    await dropIndexes();
     await dropTables();
   });
 });
