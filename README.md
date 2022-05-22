@@ -4,7 +4,8 @@
 - Jest, Supertest
 
 ### 실행 방법
-1. /secret.env 파일의 DB 접속 정보를 본인의 환경에 맞게 변경
+1. DB 생성
+2. /secret.env 파일의 DB 접속 정보를 본인의 환경에 맞게 변경
 3. 터미널에 npm install 입력
 4. 터미널에 npm run build 입력
 5. 터미널에 npm start 입력
@@ -18,7 +19,9 @@
         - GET /point/total/:userId
         
 ### 테스트 코드 실행 방법
-- 터미널에 npm test 입력
+1. TEST DB 생성
+2. /secret.env 파일의 TEST_DB 정보를 본인의 환경에 맞게 변경
+3. 터미널에 npm test 입력
 
 ### 테이블, 인덱스 DDL 파일 위치
 - /ddl.sql
