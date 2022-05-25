@@ -124,6 +124,6 @@ describe(`리뷰 포인트 지급, 수정, 취소 테스트`, () => {
 });
 
 async function requestGetTotalPoint() {
-  return await request(app).get(`/point/total/${userId}`);
+  return await request(app).get(`/members/${userId}/totalpoint`);
   // .set('Authorization', token);
 }

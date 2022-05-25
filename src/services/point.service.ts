@@ -123,4 +123,11 @@ export class PointService {
   async getTotalPoint(userId: string): Promise<number> {
     return await pointModel.getTotalPointByUserId(userId);
   }
+
+  /**
+   * 전체 포인트 내역 조회
+   */
+  async getAllUsersPointList() {
+    return await pointModel.getAllUsersPointList();
+  }
 }

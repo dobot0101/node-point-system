@@ -1,30 +1,20 @@
 import { Request, Response } from 'express';
 import { PointService } from '../services/point.service';
 
-export class PointController {
-  async getTotalPoint(req: Request, res: Response) {
-    try {
-      const { userId } = req.params;
-      const pointService = new PointService();
-      const totalPoint = await pointService.getTotalPoint(userId);
-      res.status(200).json({ success: true, totalPoint });
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ success: false, error: error.message });
-      }
-    }
-  }
+const pointService = new PointService();
 
-  async getPointList(req: Request, res: Response) {
+export class PointController {
+
+  /**
+   * 모든 유저의 포인트 내역 조회
+   */
+  async getAllUsersPointList(req: Request, res: Response) {
     try {
-      const { userId } = req.params;
-      const pointService = new PointService();
-      const pointList = await pointService.getPointList(userId);
+      const pointList = await pointService.getAllUsersPointList();
       res.status(200).json({ success: true, pointList });
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ success: false, error: error.message });
-      }
+      const { message } = error as Error;
+      res.json({ success: false, error: message });
     }
   }
 }

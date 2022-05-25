@@ -14,7 +14,7 @@ const token = jwt.sign({
 
 const userId = convertUUID('3ede0ef2-92b7-4817-a5f3-0c575361f745');
 
-describe(`point search API test`, () => {
+describe(`members point search API test`, () => {
   beforeAll(async () => {
     connectTestDB();
     await createTables();
@@ -22,7 +22,7 @@ describe(`point search API test`, () => {
   });
 
   it('should return total point', async () => {
-    const res = await request(app).get(`/point/total/${userId}`).set('Authorization', token);
+    const res = await request(app).get(`/members/${userId}/totalpoint`).set('Authorization', token);
 
     const { success, totalPoint } = res.body;
 
@@ -31,7 +31,7 @@ describe(`point search API test`, () => {
   });
 
   it('should return point list', async () => {
-    const res = await request(app).get(`/point/list/${userId}`).set('Authorization', token);
+    const res = await request(app).get(`/members/${userId}/pointlist`).set('Authorization', token);
 
     const { success, pointList } = res.body;
 

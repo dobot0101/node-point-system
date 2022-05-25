@@ -13,10 +13,12 @@
     - 포인트 적립
         - POST /events
         - Request body의 action 값(ADD, MOD, DELETE)에 따라 포인트 생성, 수정, 취소 처리됨
-    - 포인트 목록 조회
-        - GET /point/list/:userId
-    - 보유 포인트 합계 조회
-        - GET /point/total/:userId
+    - 전체 회원 포인트 내역 조회
+        - GET /points/list
+    - 회원 포인트 내역 조회
+        - GET /members/:userId/pointList
+    - 회원 포인트 합계 조회
+        - GET /members/:userId/totalPoint
         
 ### 테스트 코드 실행 방법
 1. TEST DB 생성

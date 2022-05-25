@@ -92,4 +92,12 @@ export class PointModel {
 
     return rows[0].count > 0;
   }
+
+  /**
+   * 전체 포인트 내역 조회
+   */
+  getAllUsersPointList() {
+    const rows = query(`select * from point order by created_at desc`);
+    return rows;
+  }
 }
