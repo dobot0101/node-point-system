@@ -26,10 +26,7 @@ export class MemberController {
   async getPointList(req: Request, res: Response) {
     try {
       const { userId } = req.params;
-      console.log(userId);
-      console.log(this.pointService);
       const pointList = await this.pointService.getPointList(userId);
-      console.log(pointList);
       res.status(200).json({ success: true, pointList });
     } catch (error) {
       if (error instanceof Error) {
