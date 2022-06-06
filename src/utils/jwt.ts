@@ -1,10 +1,5 @@
 import jwt from 'jsonwebtoken';
-import path from 'path';
-import dotenv from 'dotenv';
-
-dotenv.config({
-  path: path.join(__dirname, '../..', '/secret.env'),
-});
+import config from '../config';
 
 type JwtSignPayload = {
   email: string;
@@ -12,7 +7,7 @@ type JwtSignPayload = {
 };
 
 function verify(token: string) {
-  const secret = process.env.JWT_SECRET;
+  const secret = config.jwtSecret;
   if (!secret) {
     throw new Error(`JWT secret isn't exist`);
   }
@@ -24,7 +19,7 @@ function verify(token: string) {
  * access token 발급
  */
 function sign(payload: JwtSignPayload): string {
-  const secret = process.env.JWT_SECRET;
+  const secret = config.jwtSecret;
   if (!secret) {
     throw new Error(`jwt secret isn't exist`);
   }

@@ -1,10 +1,8 @@
 import express from 'express';
-import { PointController } from '../contollers/point.controller';
+import pointController from '../contollers/point.controller';
 
 const router = express.Router();
 
-const pointController = new PointController();
-
-router.get('/list', pointController.getAllUsersPointList);
+router.get('/list', (req, res) => pointController.getAllUsersPointList(req, res));
 
 export default router;

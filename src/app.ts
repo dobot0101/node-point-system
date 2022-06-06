@@ -1,11 +1,4 @@
 import express from 'express';
-import path from 'path';
-import dotenv from 'dotenv';
-
-dotenv.config({
-  path: path.join(__dirname, '..', '/secret.env'),
-});
-
 import events from './routes/events.route';
 import points from './routes/points.route';
 import members from './routes/members.route';
@@ -13,7 +6,6 @@ import { auth } from './middleware/auth';
 // import { convertUUIDInRequestBody } from './middleware/convertRequestValue';
 
 export const app = express();
-export const port = process.env.PORT;
 
 app.use(express.json());
 

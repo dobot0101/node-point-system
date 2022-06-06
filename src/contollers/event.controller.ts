@@ -1,22 +1,25 @@
 import { Request, Response } from 'express';
+import { PointModel } from '../models/point.model';
+import { ReviewModel } from '../models/review.model';
 import { PointService } from '../services/point.service';
 
 export class EventController {
+  constructor(private pointService: PointService) {}
   async updatePoint(req: Request, res: Response) {
     try {
-      const pointService = new PointService();
+      // const pointService = new PointService();
       const { body } = req;
 
       let result = false;
       switch (req.body.action) {
         case 'ADD':
-          result = await pointService.create(body);
+          result = await this.pointService.create(body);
           break;
         case 'MOD':
-          result = await pointService.modify(body);
+          result = await this.pointService.modify(body);
           break;
         case 'DELETE':
-          result = await pointService.delete(body);
+          result = await this.pointService.delete(body);
           break;
         default:
           throw new Error('invalid action');
@@ -30,3 +33,5 @@ export class EventController {
     }
   }
 }
+
+export default new EventController(new PointService(new PointModel(), new ReviewModel()));

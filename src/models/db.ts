@@ -1,15 +1,14 @@
-import { RowDataPacket } from 'mysql2';
 import mysql from 'mysql2/promise';
-import { dbConfig, testDBConfig } from '../config/db.config';
+import config from '../config';
 
 let pool: mysql.Pool;
 
 export function connectDB() {
-  pool = mysql.createPool(dbConfig);
+  pool = mysql.createPool(config.dbConfig);
 }
 
 export function connectTestDB() {
-  pool = mysql.createPool(testDBConfig);
+  pool = mysql.createPool(config.testDBConfig);
 }
 
 export async function getConnection() {

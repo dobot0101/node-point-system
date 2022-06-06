@@ -3,13 +3,11 @@ import { ReviewEventDto } from '../dto/review-event.dto';
 import { PointModel } from '../models/point.model';
 import { ReviewModel } from '../models/review.model';
 
-const pointModel = new PointModel();
-const reviewModel = new ReviewModel();
-
 export class PointService {
+  constructor(private pointModel: PointModel, private reviewModel: ReviewModel) {}
   async create(data: ReviewEventDto): Promise<boolean> {
     // 이미 포인트가 지급되었는지 확인
-    const isPointGiven = await pointModel.checkIfGivenPointByReviewId(data.reviewId);
+    const isPointGiven = await this.pointModel.checkIfGivenPointByReviewId(data.reviewId);
     if (isPointGiven) {
       throw new Error('이미 포인트가 지급되었습니다.');
     }
@@ -22,19 +20,19 @@ export class PointService {
       userId: data.userId,
       amount: 1,
     };
-    await pointModel.create(createPointData);
+    await this.pointModel.create(createPointData);
 
     // 2. 이미지 첨부했으면 추가 포인트 지급
     if (data.attachedPhotoIds.length > 0) {
       createPointData.memo = 'PHOTO';
-      await pointModel.create(createPointData);
+      await this.pointModel.create(createPointData);
     }
 
     // 3. 해당 장소의 첫번째 리뷰이면 보너스 포인트 지급
-    const isFirstReviewOfPlace = await reviewModel.checkIfFirstReviewOfPlace(data.placeId);
+    const isFirstReviewOfPlace = await this.reviewModel.checkIfFirstReviewOfPlace(data.placeId);
     if (isFirstReviewOfPlace) {
       createPointData.memo = 'BONUS';
-      await pointModel.create(createPointData);
+      await this.pointModel.create(createPointData);
     }
 
     return true;
@@ -42,17 +40,17 @@ export class PointService {
 
   async modify(data: ReviewEventDto): Promise<boolean> {
     // 원본 리뷰가 있는지 확인
-    const isPointGiven = await pointModel.checkIfGivenPointByReviewId(data.reviewId);
+    const isPointGiven = await this.pointModel.checkIfGivenPointByReviewId(data.reviewId);
     if (!isPointGiven) {
       throw new Error('포인트 지급 내역이 존재하지 않습니다.');
     }
 
     // 포토 리뷰 포인트를 받았는지 확인
-    const isPhotoPointGiven = await pointModel.checkIfGivenPhotoPointByReviewId(data.reviewId);
+    const isPhotoPointGiven = await this.pointModel.checkIfGivenPhotoPointByReviewId(data.reviewId);
 
     // 1. 사진을 첨부한 경우 PHOTO 포인트가 없으면 포인트 지급
     if (data.attachedPhotoIds.length > 0 && !isPhotoPointGiven) {
-      await pointModel.create({
+      await this.pointModel.create({
         amount: 1,
         sourceId: data.reviewId,
         sourceType: data.type,
@@ -65,9 +63,9 @@ export class PointService {
        * PHOTO 포인트를 지급 내역이 있고,
        * 보유 포인트가 남아 있으면 포인트를 차감한다.
        */
-      const havingPoint = await pointModel.getTotalPointByUserId(data.userId);
+      const havingPoint = await this.pointModel.getTotalPointByUserId(data.userId);
       if (havingPoint > 0) {
-        await pointModel.create({
+        await this.pointModel.create({
           amount: -1,
           sourceId: data.reviewId,
           sourceType: data.type,
@@ -85,10 +83,10 @@ export class PointService {
    */
   async delete(data: ReviewEventDto): Promise<boolean> {
     // 총 보유 포인트 조회
-    const havingPoint = await pointModel.getTotalPointByUserId(data.userId);
+    const havingPoint = await this.pointModel.getTotalPointByUserId(data.userId);
 
     // 삭제할 포인트 조회
-    const reviewPointToDelete = await pointModel.getTotalPointByReviewId(data.reviewId);
+    const reviewPointToDelete = await this.pointModel.getTotalPointByReviewId(data.reviewId);
 
     /**
      * 보유 포인트가 삭제할 리뷰 포인트 보다 적은 경우를 대비해서,
@@ -99,7 +97,7 @@ export class PointService {
       throw new Error('취소할 포인트가 없습니다.');
     }
 
-    await pointModel.create({
+    await this.pointModel.create({
       amount: cancelPoint * -1,
       sourceType: data.type,
       sourceId: data.reviewId,
@@ -114,20 +112,20 @@ export class PointService {
    * 특정 유저의 포인트 내역 조회
    */
   async getPointList(userId: string) {
-    return await pointModel.getPointListByUserId(userId);
+    return await this.pointModel.getPointListByUserId(userId);
   }
 
   /**
    * 특정 유저의 포인트 합계
    */
   async getTotalPoint(userId: string): Promise<number> {
-    return await pointModel.getTotalPointByUserId(userId);
+    return await this.pointModel.getTotalPointByUserId(userId);
   }
 
   /**
    * 전체 포인트 내역 조회
    */
   async getAllUsersPointList() {
-    return await pointModel.getAllUsersPointList();
+    return await this.pointModel.getAllUsersPointList();
   }
 }

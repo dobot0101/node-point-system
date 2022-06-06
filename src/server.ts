@@ -1,7 +1,8 @@
+import config from './config';
 import { createTables, dropTables, initData } from './init/init';
 import { connectDB } from './models/db';
 import jwt from './utils/jwt';
-import { app, port } from './app';
+import { app } from './app';
 
 async function main() {
   connectDB();
@@ -18,6 +19,7 @@ async function main() {
 
   console.log({ accessToken });
 
+  const { port } = config;
   app.listen(port, () => {
     console.log(`listening on port ${port}`);
   });
