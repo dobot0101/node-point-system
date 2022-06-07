@@ -63,7 +63,8 @@ export class PointModel {
       [id, userId, sourceId, sourceType, memo, amount],
     );
 
-    return rows;
+    // return rows;
+    return true;
   }
 
   /**
