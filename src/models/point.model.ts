@@ -56,6 +56,7 @@ export class PointModel {
    */
   async create(data: CreatePointDto) {
     const { amount, userId, sourceId, sourceType, memo } = data;
+    console.log(memo);
     const id = generateUUID();
 
     const rows = await query(

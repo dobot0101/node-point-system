@@ -13,13 +13,13 @@ export class EventController {
       let result = false;
       switch (req.body.action) {
         case 'ADD':
-          result = await this.pointService.create(body);
+          result = await this.pointService.createPoint(body);
           break;
         case 'MOD':
-          result = await this.pointService.modify(body);
+          result = await this.pointService.modifyPoint(body);
           break;
         case 'DELETE':
-          result = await this.pointService.delete(body);
+          result = await this.pointService.deletePoint(body);
           break;
         default:
           throw new Error('invalid action');

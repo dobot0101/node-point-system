@@ -35,7 +35,7 @@ describe('point service unit test', () => {
       type: 'REVIEW',
       userId: '123',
     };
-    const result = await pointService.create(data);
+    const result = await pointService.createPoint(data);
     expect(result).toBe(true);
   });
 });
