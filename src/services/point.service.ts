@@ -2,6 +2,12 @@ import { CreatePointDto } from '../dto/create-point.dto';
 import { ReviewEventDto } from '../dto/review-event.dto';
 import { PointModel } from '../models/point.model';
 import { ReviewModel } from '../models/review.model';
+import {
+  GiveBonusReviewPoint,
+  GivePhotoReviewPoint,
+  GiveTextReviewPoint,
+  PointGiver,
+} from './classes/PointGiver.class';
 
 export class PointService {
   constructor(private pointModel: PointModel, private reviewModel: ReviewModel) {}
@@ -12,32 +18,33 @@ export class PointService {
       throw new Error('이미 포인트가 지급되었습니다.');
     }
 
-    const promises = [];
-
-    // 1. 텍스트 리뷰 포인트 지급
-    const createPointData: CreatePointDto = {
-      memo: 'TEXT',
+    const createPointDto: CreatePointDto = {
+      memo: '',
       sourceType: data.type,
       sourceId: data.reviewId,
       userId: data.userId,
       amount: 1,
     };
 
-    promises.push(this.pointModel.create(createPointData));
+    const pointGiver = new PointGiver(createPointDto, this.pointModel);
+
+    const promises = [];
+
+    // 1. 텍스트 리뷰 포인트 지급
+    pointGiver.setGiveBehavior(new GiveTextReviewPoint());
+    promises.push(pointGiver.performGive());
 
     // 2. 이미지 첨부했으면 추가 포인트 지급
     if (data.attachedPhotoIds.length > 0) {
-      // promises.push(this.pointModel.create({ ...createPointData, memo: 'PHOTO' }));
-      createPointData.memo = 'PHOTO';
-      promises.push(this.pointModel.create(createPointData));
+      pointGiver.setGiveBehavior(new GivePhotoReviewPoint());
+      promises.push(pointGiver.performGive());
     }
 
     // 3. 해당 장소의 첫번째 리뷰이면 보너스 포인트 지급
     const isFirstReviewOfPlace = await this.reviewModel.checkIfFirstReviewOfPlace(data.placeId);
     if (isFirstReviewOfPlace) {
-      // promises.push(this.pointModel.create({ ...createPointData, memo: 'BONUS' }));
-      createPointData.memo = 'BONUS';
-      promises.push(this.pointModel.create(createPointData));
+      pointGiver.setGiveBehavior(new GiveBonusReviewPoint());
+      promises.push(pointGiver.performGive());
     }
 
     const results = await Promise.all(promises);
