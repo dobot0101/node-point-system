@@ -3,12 +3,16 @@ import { User } from './User';
 
 @Entity()
 export class Point {
+  constructor(data: Partial<Point>) {
+    Object.assign(this, data);
+  }
+
   @PrimaryColumn('uuid') id!: string;
   @Column('text') memo!: string;
   @Column('int') amount!: number;
-  @Column('string') sourceType!: string;
+  @Column('varchar', { length: 20 }) sourceType!: string;
   @Column('uuid') sourceId!: string;
-  @Column('timestamp with time zone') createdAt!: Date;
+  @Column('timestamp') createdAt!: Date;
 
   @ManyToOne(() => User)
   userId!: string;

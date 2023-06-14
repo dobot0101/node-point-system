@@ -1,9 +1,9 @@
 import { CreatePointDto } from '../../dto/create-point.dto';
-import { PointModel } from '../../models/point.model';
+import { PointRepository } from '../../repositories/PointRepository';
 
 export class PointGiver {
   private giveBehavior: PointGiveBehavior;
-  constructor(private createPointDto: CreatePointDto, private pointModel: PointModel) {
+  constructor(private createPointDto: CreatePointDto, private pointModel: PointRepository) {
     this.giveBehavior = new GiveTextReviewPoint();
   }
 
@@ -17,25 +17,25 @@ export class PointGiver {
 }
 
 interface PointGiveBehavior {
-  give(createPointDto: CreatePointDto, pointModel: PointModel): Promise<boolean>;
+  give(createPointDto: CreatePointDto, pointModel: PointRepository): Promise<boolean>;
 }
 
 export class GiveTextReviewPoint implements PointGiveBehavior {
-  give(createPointDto: CreatePointDto, pointModel: PointModel): Promise<boolean> {
+  give(createPointDto: CreatePointDto, pointModel: PointRepository): Promise<boolean> {
     createPointDto.memo = 'TEXT';
     return pointModel.create(createPointDto);
   }
 }
 
 export class GivePhotoReviewPoint implements PointGiveBehavior {
-  give(createPointDto: CreatePointDto, pointModel: PointModel): Promise<boolean> {
+  give(createPointDto: CreatePointDto, pointModel: PointRepository): Promise<boolean> {
     createPointDto.memo = 'PHOTO';
     return pointModel.create(createPointDto);
   }
 }
 
 export class GiveBonusReviewPoint implements PointGiveBehavior {
-  give(createPointDto: CreatePointDto, pointModel: PointModel): Promise<boolean> {
+  give(createPointDto: CreatePointDto, pointModel: PointRepository): Promise<boolean> {
     createPointDto.memo = 'BONUS';
     return pointModel.create(createPointDto);
   }

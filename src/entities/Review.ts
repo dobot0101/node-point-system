@@ -6,8 +6,8 @@ import { User } from './User';
 export class Review {
   @PrimaryColumn('uuid') id!: string;
   @Column('text') content!: string;
-  @Column('timestamp with time zone') created_at!: Date;
-  @Column('timestamp with time zone') modified_at!: Date | null;
+  @Column('timestamp') createdAt!: Date;
+  @Column('timestamp', { nullable: true }) modifiedAt!: Date | null;
 
   @ManyToOne(() => User)
   userId!: string;
@@ -19,7 +19,7 @@ export class Review {
 @Entity()
 export class ReviewPhoto {
   @PrimaryColumn('uuid') id!: string;
-  @Column('timestamp with time zone') createdAt!: Date;
+  @Column('timestamp') createdAt!: Date;
 
   @ManyToOne(() => Review)
   reviewId!: string;
