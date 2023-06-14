@@ -5,10 +5,12 @@ let pool: mysql.Pool;
 
 export function connectDB() {
   pool = mysql.createPool(config.dbConfig);
+  return pool;
 }
 
 export function connectTestDB() {
   pool = mysql.createPool(config.testDBConfig);
+  return pool;
 }
 
 export async function getConnection() {
