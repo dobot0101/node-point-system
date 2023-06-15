@@ -1,8 +1,12 @@
-import { PointController } from './contollers/point.controller';
 import { PointRepository } from './repositories/PointRepository';
 import { ReviewRepository } from './repositories/ReviewRepository';
 import { UserRepository } from './repositories/UserRepository';
-import { PointService } from './services/point.service';
+import { EventRoute } from './routes/EventRoute';
+import { PointRoute } from './routes/PointRoute';
+import { UserRoute } from './routes/UserRoute';
+import { JwtService } from './services/JwtService';
+import { PointService } from './services/PointService';
+import { UserService } from './services/UserService';
 
 export class Container {
   // repository
@@ -12,7 +16,11 @@ export class Container {
 
   // service
   pointService = new PointService(this.pointRepository, this.reviewRepository);
+  userService = new UserService(this.userRepository);
+  jwtService = new JwtService();
 
-  // controller
-  pointController = new PointController(this.pointService);
+  // router
+  eventRoute = new EventRoute(this.pointService);
+  userRoute = new UserRoute(this.userService, this.jwtService);
+  pointRoute = new PointRoute(this.pointService);
 }

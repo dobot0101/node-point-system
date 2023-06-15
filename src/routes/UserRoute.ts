@@ -1,24 +1,34 @@
-// import express from 'express';
-// import memberController from '../contollers/member.controller';
-// import { convertUUIDInRequestParam } from '../middleware/convertUUID';
-// import { App } from '../app';
-// import { Container } from '../server';
+import express from 'express';
+import { JwtService } from '../services/JwtService';
+import { UserService } from '../services/UserService';
 
-// export class UserRoute {
-//   public router;
-//   constructor(private container: Container) {
-//     this.router = express.Router();
-//     this.router.post('/login', (req, res) => {
-//       const { username, password } = req.body;
+export class UserRoute {
+  private router;
+  constructor(private userService: UserService, private jwtService: JwtService) {
+    this.router = express.Router();
 
-//       getServices().userService.login(username, password);
+    this.router.post('/login', async (req, res) => {
+      const { email, password } = req.body;
+      if (await this.userService.login(email, password)) {
+        const token = jwtService.getToken(email);
+        res.json({ token });
+      } else {
+        res.status(401).json({ message: 'Invalid id or password' });
+      }
+    });
 
-//       if (username === 'admin' && password === 'password') {
-//         const token = jwt.sign({ username }, configs.JWT_SECRET_KEY, { expiresIn: '1h' });
-//         res.json({ token });
-//       } else {
-//         res.status(401).json({ message: 'Invalid id or password' });
-//       }
-//     });
-//   }
-// }
+    this.router.post('/register', async (req, res) => {
+      const { email, password } = req.body;
+      const user = await this.userService.signUp(email, password);
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(401).json({ message: 'Invalid id or password' });
+      }
+    });
+  }
+
+  getRouter() {
+    return this.router;
+  }
+}
