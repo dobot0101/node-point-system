@@ -15,6 +15,9 @@ async function main() {
 
   const app = express();
   app.use(express.json());
+  app.get('/', (req, res, next) => {
+    res.json('Hello World');
+  });
   app.use('/points', container.pointRoute.getRouter);
   app.use(errorHandler);
 
@@ -33,5 +36,13 @@ function errorHandler(err: unknown, req: Request, res: Response, next: NextFunct
     res.status(401).send({ error: 'Unauthorized' });
   } else if (err instanceof PermissionDeniedError) {
     res.status(403).send({ error: 'Pemrissino Denied' });
+  } else {
+    let errorMessage;
+    if (err instanceof Error) {
+      errorMessage = err.message;
+    } else {
+      errorMessage = err as string;
+    }
+    res.status(500).send({ error: errorMessage });
   }
 }
