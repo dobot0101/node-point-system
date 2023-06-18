@@ -5,10 +5,11 @@ FROM node:18.16
 WORKDIR /app
 
 # Copy the package.json and package-lock.json files
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm ci
+# RUN npm install
 
 # Copy the rest of the application code
 COPY . .

@@ -7,16 +7,6 @@ import { ReviewRepository } from '../repositories/ReviewRepository';
 export class PointService {
   constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
 
-  getPointList(userId: string) {
-    throw new Error('Method not implemented.');
-  }
-  getTotalPoint(userId: string) {
-    throw new Error('Method not implemented.');
-  }
-  getAllUsersPointList() {
-    throw new Error('Method not implemented.');
-  }
-
   async createPoint(data: ReviewEventDto): Promise<Point[]> {
     const existingPoint = await this.pointRepository.findByReviewId(data.reviewId);
     if (existingPoint.length > 0) {
@@ -26,17 +16,38 @@ export class PointService {
     const points: Point[] = [];
 
     // 텍스트 리뷰
-    points.push(this.createPointInstance(data, 1, 'TEXT_REVIEW', '텍스트 리뷰 포인트'));
+    points.push(
+      this.createPointInstance({
+        amount: 1,
+        memo: '텍스트 리뷰 포인트',
+        sourceId: data.reviewId,
+        userId: data.userId,
+      }),
+    );
 
     // 이미지 첨부했으면 포토 리뷰 포인트
     if (data.attachedPhotoIds.length > 0) {
-      points.push(this.createPointInstance(data, 1, 'PHOTO_REVIEW', '포토 리뷰 포인트'));
+      points.push(
+        this.createPointInstance({
+          amount: 1,
+          memo: '포토 리뷰 포인트',
+          sourceId: data.reviewId,
+          userId: data.userId,
+        }),
+      );
     }
 
     // 3. 해당 장소의 첫번째 리뷰이면 보너스 포인트 지급
     const reviews = await this.reviewRepository.findByPlaceId(data.placeId);
     if (reviews.length === 1) {
-      points.push(this.createPointInstance(data, 1, 'BONUS_REVIEW', '보너스 리뷰 포인트'));
+      points.push(
+        this.createPointInstance({
+          amount: 1,
+          memo: '보너스 리뷰 포인트',
+          sourceId: data.reviewId,
+          userId: data.userId,
+        }),
+      );
     }
 
     await Promise.all(points.map(async (point) => await this.pointRepository.save(point)));
@@ -44,13 +55,13 @@ export class PointService {
     return points;
   }
 
-  private createPointInstance(data: ReviewEventDto, amount: number, type: string, memo: string): Point {
+  private createPointInstance(data: CreatePointData): Point {
     return new Point({
       id: randomUUID(),
-      amount: 1,
-      memo: memo,
-      sourceId: data.reviewId,
-      sourceType: type,
+      amount: data.amount,
+      memo: data.memo,
+      sourceId: data.sourceId,
+      sourceType: 'REVIEW',
       userId: data.userId,
       createdAt: new Date(),
     });
@@ -67,7 +78,12 @@ export class PointService {
 
     // 1. 사진을 첨부한 경우 PHOTO 포인트가 없으면 포인트 지급
     if (data.attachedPhotoIds.length > 0 && !photoReviewPoint) {
-      const point = this.createPointInstance(data, 1, 'PHOTO_REVIEW', '포토 리뷰 포인트');
+      const point = this.createPointInstance({
+        amount: 1,
+        memo: '포토 리뷰 포인트',
+        sourceId: data.reviewId,
+        userId: data.userId,
+      });
       await this.pointRepository.save(point);
     } else if (data.attachedPhotoIds.length === 0 && photoReviewPoint) {
       /**
@@ -77,7 +93,12 @@ export class PointService {
        */
       const points = await this.pointRepository.findByUserId(data.userId);
       if (points.length > 0) {
-        const point = this.createPointInstance(data, -1, 'PHOTO_REVIEW', '포토 리뷰 포인트');
+        const point = this.createPointInstance({
+          amount: -1,
+          memo: '포토 리뷰 포인트',
+          sourceId: data.reviewId,
+          userId: data.userId,
+        });
         await this.pointRepository.save(point);
       }
     }
@@ -102,6 +123,30 @@ export class PointService {
       throw new Error('취소할 포인트가 없습니다.');
     }
 
-    await this.pointRepository.save(this.createPointInstance(data, cancelPoint * -1, data.type, '포인트 취소'));
+    await this.pointRepository.save(
+      this.createPointInstance({
+        amount: cancelPoint * -1,
+        memo: '포인트 취소',
+        sourceId: data.reviewId,
+        userId: data.userId,
+      }),
+    );
+  }
+
+  async getPointByUserId(userId: string) {
+    return await this.pointRepository.findByUserId(userId);
+  }
+
+  async getTotalPointByUserId(userId: string) {
+    const points = await this.pointRepository.findByUserId(userId);
+    return points.reduce((acc, point) => acc + point.amount, 0);
   }
 }
+
+export type CreatePointData = {
+  amount: number;
+  memo: string;
+  sourceId: string;
+  // sourceType: string;
+  userId: string;
+};

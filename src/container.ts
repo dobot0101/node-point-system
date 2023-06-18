@@ -1,10 +1,12 @@
+import { configs } from './config';
 import { PointRepository } from './repositories/PointRepository';
 import { ReviewRepository } from './repositories/ReviewRepository';
 import { UserRepository } from './repositories/UserRepository';
-import { EventRoute } from './routes/EventRoute';
 import { PointRoute } from './routes/PointRoute';
 import { UserRoute } from './routes/UserRoute';
+import { AuthService } from './services/AuthService';
 import { JwtService } from './services/JwtService';
+import { PermissionService } from './services/PermissionService';
 import { PointService } from './services/PointService';
 import { UserService } from './services/UserService';
 
@@ -17,10 +19,11 @@ export class Container {
   // service
   pointService = new PointService(this.pointRepository, this.reviewRepository);
   userService = new UserService(this.userRepository);
-  jwtService = new JwtService();
+  jwtService = new JwtService(configs.JWT_SECRET_KEY);
+  authService = new AuthService(this.jwtService, this.userRepository);
+  permissionService = new PermissionService(this.userRepository);
 
   // router
-  eventRoute = new EventRoute(this.pointService);
   userRoute = new UserRoute(this.userService, this.jwtService);
-  pointRoute = new PointRoute(this.pointService);
+  pointRoute = new PointRoute(this.pointService, this.authService, this.permissionService);
 }
