@@ -15,10 +15,15 @@ async function main() {
 
   const app = express();
   app.use(express.json());
+  app.use(
+    express.urlencoded({
+      extended: false,
+    }),
+  );
   app.get('/', (req, res, next) => {
     res.json('Hello World');
   });
-  app.use('/points', container.pointRoute.getRouter);
+  app.use('/points', container.pointRoute.getRouter());
   app.use(errorHandler);
 
   app.listen(port, () => {
@@ -35,7 +40,7 @@ function errorHandler(err: unknown, req: Request, res: Response, next: NextFunct
   if (err instanceof UnAuthorizedError) {
     res.status(401).send({ error: 'Unauthorized' });
   } else if (err instanceof PermissionDeniedError) {
-    res.status(403).send({ error: 'Pemrissino Denied' });
+    res.status(403).send({ error: 'Permission Denied' });
   } else {
     let errorMessage;
     if (err instanceof Error) {
@@ -43,6 +48,6 @@ function errorHandler(err: unknown, req: Request, res: Response, next: NextFunct
     } else {
       errorMessage = err as string;
     }
-    res.status(500).send({ error: errorMessage });
+    res.status(500).json({ success: false, error: errorMessage });
   }
 }
