@@ -1,7 +1,7 @@
 import express from 'express';
+import { UnAuthenticatedError } from '../errors';
 import { JwtService } from '../services/JwtService';
 import { UserService } from '../services/UserService';
-import { UnAuthorizedError } from '../errors';
 
 export class UserRoute {
   private router;
@@ -15,7 +15,7 @@ export class UserRoute {
           const token = this.jwtService.encodeToken(email);
           res.json({ token });
         } else {
-          throw new UnAuthorizedError('Invalid id or password');
+          throw new UnAuthenticatedError('Invalid id or password');
         }
       } catch (error) {
         next(error);

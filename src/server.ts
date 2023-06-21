@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import { Container } from './container';
 import { AppDataSource } from './db';
-import { PermissionDeniedError, UnAuthorizedError } from './errors';
+import { PermissionDeniedError, UnAuthenticatedError } from './errors';
 
 async function main() {
   if (!AppDataSource.isInitialized) {
@@ -20,6 +20,7 @@ async function main() {
       extended: false,
     }),
   );
+  app.use(container.authService.checkAuth);
   app.get('/', (req, res, next) => {
     res.json('Hello World');
   });
@@ -37,8 +38,8 @@ main().catch((err) => {
 });
 
 function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction) {
-  if (err instanceof UnAuthorizedError) {
-    res.status(401).send({ error: 'Unauthorized' });
+  if (err instanceof UnAuthenticatedError) {
+    res.status(401).send({ error: 'Unauthenticated' });
   } else if (err instanceof PermissionDeniedError) {
     res.status(403).send({ error: 'Permission Denied' });
   } else {
