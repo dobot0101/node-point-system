@@ -20,10 +20,10 @@ async function main() {
       extended: false,
     }),
   );
-  app.use(container.authService.checkAuth);
   app.get('/', (req, res, next) => {
     res.json('Hello World');
   });
+  app.use('/users', container.userRoute.getRouter());
   app.use('/points', container.pointRoute.getRouter());
   app.use(errorHandler);
 
