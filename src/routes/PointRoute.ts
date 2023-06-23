@@ -17,8 +17,8 @@ export class PointRoute {
      */
     this.router.post('/', this.authService.checkAuth, async (req, res, next) => {
       try {
-        const { body, userId } = req;
-        await this.permissionService.mustBeAdmin(userId!);
+        await this.permissionService.mustBeAdmin(req.userId!);
+        const { body } = req;
 
         let result = false;
         switch (req.body.action) {
@@ -29,7 +29,7 @@ export class PointRoute {
             await this.pointService.updatePoint(body);
             break;
           case 'DELETE':
-            await this.pointService.deletePoint(body);
+            await this.pointService.deductPoint(body);
             break;
           default:
             throw new Error('invalid action');

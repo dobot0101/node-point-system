@@ -1,4 +1,4 @@
-export class ReviewEventDto {
+export class CreateReviewBody {
   type!: string;
   action!: string;
   reviewId!: string;

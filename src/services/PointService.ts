@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { ReviewEventDto } from '../dto/review-event.dto';
+import { CreateReviewBody } from '../dto/CreateReviewBody';
 import { Point } from '../entities/Point';
 import { PointRepository } from '../repositories/PointRepository';
 import { ReviewRepository } from '../repositories/ReviewRepository';
@@ -7,7 +7,7 @@ import { ReviewRepository } from '../repositories/ReviewRepository';
 export class PointService {
   constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
 
-  async createPoint(data: ReviewEventDto): Promise<Point[]> {
+  async createPoint(data: CreateReviewBody): Promise<Point[]> {
     const existingPoint = await this.pointRepository.findByReviewId(data.reviewId);
     if (existingPoint.length > 0) {
       throw new Error('이미 포인트가 지급되었습니다.');
@@ -67,7 +67,7 @@ export class PointService {
     });
   }
 
-  async updatePoint(data: ReviewEventDto) {
+  async updatePoint(data: CreateReviewBody) {
     const existingPoints = await this.pointRepository.findByReviewId(data.reviewId);
     if (existingPoints.length === 0) {
       throw new Error('포인트 지급 내역이 존재하지 않습니다.');
@@ -107,7 +107,7 @@ export class PointService {
   /**
    * 리뷰 삭제 시 포인트 차감
    */
-  async deletePoint(data: ReviewEventDto) {
+  async deductPoint(data: CreateReviewBody) {
     const havingPoints = await this.pointRepository.findByUserId(data.userId);
     const totalHavingPoint = havingPoints.reduce((acc, point) => acc + point.amount, 0);
     const totalReviewPoint = havingPoints
