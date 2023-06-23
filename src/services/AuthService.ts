@@ -1,14 +1,16 @@
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { NextFunction, Request, Response } from 'express';
-import { CreateUserDto, User } from '../entities/User';
+import { sign, verify } from 'jsonwebtoken';
+import { configs } from '../config';
+import { CreateUserDto } from '../dto/CreateUserDto';
+import { User } from '../entities/User';
 import { UnAuthenticatedError } from '../errors';
 import { UserRepository } from '../repositories/UserRepository';
-import { JwtService } from './JwtService';
 
 export class AuthService {
-  constructor(private jwtService: JwtService, private userRepository: UserRepository) {}
-  async checkAuth(req: Request, res: Response, next: NextFunction) {
+  constructor(private userRepository: UserRepository) {}
+  async auth(req: Request, res: Response, next: NextFunction) {
     try {
       const { authorization } = req.headers;
       if (!authorization || authorization.startsWith('Bearer ')) {
@@ -16,12 +18,12 @@ export class AuthService {
       }
 
       const token = authorization.split(' ')[1];
-      const { userId } = this.jwtService.decodeToken(token);
+      const { userId } = verify(token, configs.JWT_SECRET_KEY) as DataStoredInToken;
       const user = await this.userRepository.findById(userId);
       if (!user) {
         throw new UnAuthenticatedError();
       }
-      req.userId = userId;
+      req.userId = user.id;
       next();
     } catch (error) {
       next(error);
@@ -35,9 +37,7 @@ export class AuthService {
       throw new Error(`이미 회원가입된 이메일입니다.`);
     }
 
-    // Hash the password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
       id: randomUUID(),
@@ -46,20 +46,44 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return user;
+    return await this.userRepository.save(user);
   }
 
-  async login(email: string, password: string) {
-    const user = await this.userRepository.findByEmail(email);
+  // async login(email: string, password: string) {
+  async login(data: CreateUserDto) {
+    const user = await this.userRepository.findByEmail(data.email);
     if (!user) {
       throw new Error('회원이 존재하지 않습니다.');
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
+    const isPasswordMatched = await bcrypt.compare(data.password, user.password);
+    if (!isPasswordMatched) {
       throw new Error(`잘못된 비밀번호입니다.`);
     }
 
-    return true;
+    const tokenData = await this.createToken(user);
+    const cookie = await this.createCookie(tokenData);
+    return { user, cookie };
+  }
+
+  public createToken(user: User): TokenData {
+    const dataStoredInToken: DataStoredInToken = { userId: user.id };
+    const expiresIn: number = 60 * 60;
+    const token = sign(dataStoredInToken, configs.JWT_SECRET_KEY, { expiresIn });
+
+    return { expiresIn, token };
+  }
+
+  public createCookie(tokenData: TokenData): string {
+    return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn};`;
   }
 }
+
+type TokenData = {
+  expiresIn: number;
+  token: string;
+};
+
+type DataStoredInToken = {
+  userId: string;
+};

@@ -3,6 +3,9 @@ import 'reflect-metadata';
 import { Container } from './container';
 import { AppDataSource } from './db';
 import { PermissionDeniedError, UnAuthenticatedError } from './errors';
+import cookieParser from 'cookie-parser';
+import { configs } from './config';
+import { verify } from 'jsonwebtoken';
 
 async function main() {
   if (!AppDataSource.isInitialized) {
@@ -20,6 +23,8 @@ async function main() {
       extended: false,
     }),
   );
+  app.use(cookieParser());
+
   app.get('/', (req, res, next) => {
     res.json('Hello World');
   });

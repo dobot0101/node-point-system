@@ -2,6 +2,9 @@ import { AppDataSource } from '../db';
 import { User } from '../entities/User';
 
 export class UserRepository {
+  async save(...users: User[]) {
+    return await AppDataSource.getRepository(User).save(users);
+  }
   async findById(userId: string) {
     return await AppDataSource.getRepository(User).findOne({
       where: {

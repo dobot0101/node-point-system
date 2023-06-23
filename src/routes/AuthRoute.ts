@@ -1,24 +1,22 @@
 import { ValidationError, validate } from 'class-validator';
 import express from 'express';
-import { CreateUserDto } from '../entities/User';
-import { BadRequestError, UnAuthenticatedError } from '../errors';
+import { CreateUserDto } from '../dto/CreateUserDto';
+import { BadRequestError } from '../errors';
 import { AuthService } from '../services/AuthService';
 import { JwtService } from '../services/JwtService';
 
 export class AuthRoute {
   private router;
-  constructor(private userService: AuthService, private jwtService: JwtService) {
+  constructor(private authService: AuthService, private jwtService: JwtService) {
     this.router = express.Router();
 
     this.router.post('/login', async (req, res, next) => {
       try {
-        const { email, password } = req.body;
-        if (await this.userService.login(email, password)) {
-          const token = this.jwtService.encodeToken(email);
-          res.json({ token });
-        } else {
-          throw new UnAuthenticatedError('Invalid id or password');
-        }
+        const userData: CreateUserDto = req.body;
+        const { cookie, user } = await this.authService.login(userData);
+
+        res.setHeader('Set-Cookie', [cookie]);
+        res.status(200).json({ data: user, message: 'login' });
       } catch (error) {
         next(error);
       }
@@ -36,7 +34,8 @@ export class AuthRoute {
           throw new BadRequestError(getErrorMessageFromValidationErrors(errors));
         }
 
-        const user = await this.userService.signUp(createUserDto);
+        const user = await this.authService.signUp(createUserDto);
+        res.status(201).json({ data: user, message: 'signed up' });
         res.json(user);
       } catch (error) {
         next(error);
