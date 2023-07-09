@@ -18,7 +18,7 @@ export class Container {
   // service
   pointService = new PointService(this.pointRepository, this.reviewRepository);
   jwtService = new JwtService(configs.JWT_SECRET_KEY);
-  authService = new AuthService(this.jwtService, this.userRepository);
+  authService = new AuthService(this.userRepository);
   permissionService = new PermissionService(this.userRepository);
 
   // router
