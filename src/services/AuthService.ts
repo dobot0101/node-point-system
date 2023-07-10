@@ -49,7 +49,6 @@ export class AuthService {
     return await this.userRepository.save(user);
   }
 
-  // async login(email: string, password: string) {
   async login(data: CreateUserDto) {
     const user = await this.userRepository.findByEmail(data.email);
     if (!user) {
