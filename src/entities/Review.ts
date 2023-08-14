@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 import { Place } from './Place';
 import { User } from './User';
 
@@ -13,7 +13,14 @@ export class Review {
   userId!: string;
 
   @ManyToOne(() => Place)
+  place!: Place;
   placeId!: string;
+
+  @OneToMany(() => ReviewPhoto, (photo) => photo.review, {
+    eager: true,
+    cascade: true,
+  })
+  photos!: ReviewPhoto[];
 }
 
 @Entity()
@@ -21,6 +28,7 @@ export class ReviewPhoto {
   @PrimaryColumn('uuid') id!: string;
   @Column('timestamp') createdAt!: Date;
 
-  @ManyToOne(() => Review)
+  @ManyToOne(() => Review, { orphanedRowAction: 'delete' })
+  review!: Review;
   reviewId!: string;
 }

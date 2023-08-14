@@ -5,16 +5,7 @@ export class PointRepository {
   async findByReviewId(reviewId: string) {
     return await AppDataSource.getRepository(Point).find({
       where: {
-        sourceId: reviewId,
-      },
-    });
-  }
-
-  async getBySourceTypeAndSourceId(sourceType: string, sourceId: string) {
-    return await AppDataSource.getRepository(Point).findOne({
-      where: {
-        sourceType,
-        sourceId,
+        reviewId,
       },
     });
   }

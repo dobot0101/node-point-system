@@ -1,4 +1,4 @@
-export class CreateReviewBody {
+export class CreateReviewRequest {
   type!: string;
   action!: string;
   reviewId!: string;
