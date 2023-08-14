@@ -1,11 +1,12 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { User } from './User';
 import { Review } from './Review';
+import { User } from './User';
 
 export enum PointSourceType {
   TEXT_REVIEW = 'TEXT_REVIEW',
   PHOTO_REVIEW = 'PHOTO_REVIEW',
   PLACE_REVIEW = 'PLACE_REVIEW',
+  CANCELED_REVIEW = 'CANCELED_REVIEW',
 }
 
 export enum PointType {

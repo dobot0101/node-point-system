@@ -8,9 +8,14 @@ export class PointUpdateService {
   constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
 
   async updatePoint(req: PointRequest) {
-    const points = await this.pointRepository.findByReviewId(req.reviewId);
-    if (points.length === 0) {
-      throw new Error('포인트 지급 내역이 존재하지 않습니다.');
+    const reviewPoints = await this.pointRepository.findByReviewId(req.reviewId);
+    if (reviewPoints.length === 0) {
+      throw new Error(`리뷰 포인트가 존재하지 않습니다. reviewId: ${req.reviewId}`);
+    }
+
+    const userPoints = await this.pointRepository.findByUserId(req.userId);
+    if (userPoints.length === 0) {
+      throw new Error(`유저 포인트가 존재하지 않습니다.`);
     }
 
     const review = await this.reviewRepository.findById(req.reviewId);
@@ -18,15 +23,15 @@ export class PointUpdateService {
       throw new Error(`리뷰가 존재하지 않습니다.`);
     }
 
-    // 포토 리뷰 포인트를 받았는지 확인
-    const photoReviewPoint = points.find((point) => point.sourceType === PointSourceType.PHOTO_REVIEW);
-    const placeReviewPoint = points.find((point) => point.sourceType === PointSourceType.PLACE_REVIEW);
-    let totalRemainingPoints = points.reduce(
+    const pointsToSave = [];
+
+    let totalRemainingPoints = userPoints.reduce(
       (acc, point) => (point.type === PointType.ISSUANCE ? acc + point.amount : acc - point.amount),
       0,
     );
 
-    const pointsToSave = [];
+    const photoReviewPoint = reviewPoints.find((point) => point.sourceType === PointSourceType.PHOTO_REVIEW);
+    const placeReviewPoint = reviewPoints.find((point) => point.sourceType === PointSourceType.PLACE_REVIEW);
 
     // 포토 리뷰가 추가됐으면 포인트 지급
     if (review.photos.length > 0 && !photoReviewPoint) {

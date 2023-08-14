@@ -1,11 +1,17 @@
-import { CreateReviewRequest } from '../dto/CreatePointRequest';
 import { PointRequest } from '../dto/PointRequest';
 import { Point } from '../entities/Point';
+import { PointRepository } from '../repositories/PointRepository';
 import { PointCreateService } from './PointCreateService';
+import { PointDeductService } from './PointDeductService';
 import { PointUpdateService } from './PointUpdateService';
 
 export class PointService {
-  constructor(private pointCreateService: PointCreateService, private pointUpdateService: PointUpdateService) {}
+  constructor(
+    private pointCreateService: PointCreateService,
+    private pointUpdateService: PointUpdateService,
+    private pointDeductService: PointDeductService,
+    private pointRepository: PointRepository,
+  ) {}
 
   async createPoint(req: PointRequest): Promise<Point[]> {
     return this.pointCreateService.createPoint(req);
@@ -18,30 +24,8 @@ export class PointService {
   /**
    * 리뷰 삭제 시 포인트 차감
    */
-  async deductPoint(data: CreateReviewRequest) {
-    const havingPoints = await this.pointRepository.findByUserId(data.userId);
-    const totalHavingPoint = havingPoints.reduce((acc, point) => acc + point.amount, 0);
-    const totalReviewPoint = havingPoints
-      .filter((point) => point.sourceId === data.reviewId)
-      .reduce((acc, point) => acc + point.amount, 0);
-
-    /**
-     * 보유 포인트가 삭제할 리뷰 포인트 보다 적은 경우를 대비해서,
-     * 보유 포인트와 리뷰 포인트 중 작은 값을 보유 포인트에서 뺀다.
-     */
-    const cancelPoint = Math.min(totalHavingPoint, totalReviewPoint);
-    if (cancelPoint <= 0) {
-      throw new Error('취소할 포인트가 없습니다.');
-    }
-
-    await this.pointRepository.save(
-      this.createPointInstance({
-        amount: cancelPoint * -1,
-        memo: '포인트 취소',
-        sourceId: data.reviewId,
-        userId: data.userId,
-      }),
-    );
+  async deductPoint(req: PointRequest) {
+    return this.pointDeductService.deductPoint(req);
   }
 
   async getPointByUserId(userId: string) {
@@ -53,11 +37,3 @@ export class PointService {
     return points.reduce((acc, point) => acc + point.amount, 0);
   }
 }
-
-export type CreatePointInstanceData = {
-  amount: number;
-  memo: string;
-  sourceId: string;
-  sourceType: string;
-  userId: string;
-};
