@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
-import { Place } from './Place';
-import { User } from './User';
+import { Place } from '../../place/entity/Place';
+import { User } from '../../user/entity/User';
 
 @Entity()
 export class Review {

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { configs } from '../config';
+import { configs } from '../../../config';
 
 export type DecodedJwtToken = {
   userId: string;

@@ -2,11 +2,11 @@ import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { sign, verify } from 'jsonwebtoken';
-import { configs } from '../config';
-import { CreateUserDto } from '../dto/CreateUserDto';
-import { User } from '../entities/User';
-import { UnAuthenticatedError } from '../errors';
-import { UserRepository } from '../repositories/UserRepository';
+import { configs } from '../../../config';
+import { CreateUserDto } from '../../user/dto/CreateUserDto';
+import { User } from '../../user/entity/User';
+import { UnAuthenticatedError } from '../../../error/errors';
+import { UserRepository } from '../../user/repository/UserRepository';
 
 export class AuthService {
   constructor(private userRepository: UserRepository) {}

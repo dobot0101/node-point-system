@@ -1,7 +1,7 @@
 import express from 'express';
-import { AuthService } from '../services/AuthService';
-import { PermissionService } from '../services/PermissionService';
-import { PointService } from '../services/PointService';
+import { AuthService } from '../domain/auth/service/AuthService';
+import { PointService } from '../domain/point/service/PointService';
+import { PermissionService } from '../domain/user/service/PermissionService';
 
 export class PointRoute {
   private router;

@@ -1,9 +1,9 @@
 import { ValidationError, validate } from 'class-validator';
 import express from 'express';
-import { CreateUserDto } from '../dto/CreateUserDto';
-import { BadRequestError } from '../errors';
-import { AuthService } from '../services/AuthService';
-import { JwtService } from '../services/JwtService';
+import { AuthService } from '../domain/auth/service/AuthService';
+import { JwtService } from '../domain/auth/service/JwtService';
+import { CreateUserDto } from '../domain/user/dto/CreateUserDto';
+import { BadRequestError } from '../error/errors';
 
 export class AuthRoute {
   private router;

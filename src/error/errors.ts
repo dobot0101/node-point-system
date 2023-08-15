@@ -19,8 +19,8 @@ export class UnAuthenticatedError extends CustomError {
   }
 }
 export class BadRequestError extends CustomError {
-  constructor() {
-    super(400, 'Bad Request');
+  constructor(message: string = 'Bad Request') {
+    super(400, message);
   }
 }
 export class UserNotFoundError extends CustomError {

@@ -1,5 +1,4 @@
-import { IsEnum, IsNumber, IsUUID } from 'class-validator';
-import { PointSourceType } from '../entities/Point';
+import { IsNumber, IsUUID } from 'class-validator';
 
 export class PointRequest {
   @IsUUID()

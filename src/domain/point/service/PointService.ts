@@ -1,6 +1,6 @@
 import { PointRequest } from '../dto/PointRequest';
-import { Point } from '../entities/Point';
-import { PointRepository } from '../repositories/PointRepository';
+import { Point } from '../entity/Point';
+import { PointRepository } from '../repository/PointRepository';
 import { PointCreateService } from './PointCreateService';
 import { PointDeductService } from './PointDeductService';
 import { PointUpdateService } from './PointUpdateService';

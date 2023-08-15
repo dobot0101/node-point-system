@@ -1,5 +1,5 @@
-import { AppDataSource } from '../db';
-import { Review } from '../entities/Review';
+import { AppDataSource } from '../../../db';
+import { Review } from '../entity/Review';
 
 export class ReviewRepository {
   async findById(id: string) {

@@ -1,5 +1,5 @@
-import { AppDataSource } from '../db';
-import { User } from '../entities/User';
+import { AppDataSource } from '../../../db';
+import { User } from '../entity/User';
 
 export class UserRepository {
   async save(...users: User[]) {

@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import { Container } from './container';
 import { AppDataSource } from './db';
-import { CustomError } from './errors';
+import { CustomError } from './error/errors';
 
 async function main() {
   if (!AppDataSource.isInitialized) {

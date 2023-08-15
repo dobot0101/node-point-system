@@ -1,17 +1,17 @@
 import { configs } from './config';
-import { PointRepository } from './repositories/PointRepository';
-import { ReviewRepository } from './repositories/ReviewRepository';
-import { UserRepository } from './repositories/UserRepository';
+import { AuthService } from './domain/auth/service/AuthService';
+import { JwtService } from './domain/auth/service/JwtService';
+import { PointRepository } from './domain/point/repository/PointRepository';
+import { PointCreateService } from './domain/point/service/PointCreateService';
+import { PointDeductService } from './domain/point/service/PointDeductService';
+import { PointService } from './domain/point/service/PointService';
+import { PointUpdateService } from './domain/point/service/PointUpdateService';
+import { UserRepository } from './domain/user/repository/UserRepository';
+import { PermissionService } from './domain/user/service/PermissionService';
+import { UserService } from './domain/user/service/UserService';
+import { ReviewRepository } from './domain/review/repository/ReviewRepository';
 import { AuthRoute } from './routes/AuthRoute';
 import { PointRoute } from './routes/PointRoute';
-import { AuthService } from './services/AuthService';
-import { JwtService } from './services/JwtService';
-import { PermissionService } from './services/PermissionService';
-import { PointCreateService } from './services/PointCreateService';
-import { PointDeductService } from './services/PointDeductService';
-import { PointService } from './services/PointService';
-import { PointUpdateService } from './services/PointUpdateService';
-import { UserService } from './services/UserService';
 
 export class Container {
   // repository

@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
+import { UserNotFoundError } from '../../../error/errors';
+import { UserService } from '../../user/service/UserService';
 import { PointRequest } from '../dto/PointRequest';
-import { Point, PointSourceType, PointType } from '../entities/Point';
-import { UserNotFoundError } from '../errors';
-import { PointRepository } from '../repositories/PointRepository';
-import { UserService } from './UserService';
+import { Point, PointSourceType, PointType } from '../entity/Point';
+import { PointRepository } from '../repository/PointRepository';
 
 export class PointDeductService {
   constructor(private pointRepository: PointRepository, private userService: UserService) {}

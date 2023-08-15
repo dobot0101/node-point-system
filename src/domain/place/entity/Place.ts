@@ -1,5 +1,5 @@
 import { Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { Review } from './Review';
+import { Review } from '../../review/entity/Review';
 
 @Entity()
 export class Place {

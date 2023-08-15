@@ -1,5 +1,5 @@
-import { PermissionDeniedError } from '../errors';
-import { UserRepository } from '../repositories/UserRepository';
+import { PermissionDeniedError } from '../../../error/errors';
+import { UserRepository } from '../repository/UserRepository';
 
 export class PermissionService {
   constructor(private userRepository: UserRepository) {}
