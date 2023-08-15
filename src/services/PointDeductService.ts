@@ -1,14 +1,20 @@
 import { randomUUID } from 'crypto';
 import { PointRequest } from '../dto/PointRequest';
 import { Point, PointSourceType, PointType } from '../entities/Point';
+import { UserNotFoundError } from '../errors';
 import { PointRepository } from '../repositories/PointRepository';
+import { UserService } from './UserService';
 
 export class PointDeductService {
-  constructor(private pointRepository: PointRepository) {}
+  constructor(private pointRepository: PointRepository, private userService: UserService) {}
 
   async deductPoint(req: PointRequest) {
+    if (!(await this.userService.isUserExists(req.userId))) {
+      throw new UserNotFoundError();
+    }
+
     const userPoints = await this.pointRepository.findByUserId(req.userId);
-    let totalRemainingPoints = userPoints.reduce(
+    const totalRemainingPoints = userPoints.reduce(
       (acc, point) => (point.type === PointType.ISSUANCE ? acc + point.amount : acc - point.amount),
       0,
     );

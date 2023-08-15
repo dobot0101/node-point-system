@@ -1,8 +1,10 @@
 import { randomUUID } from 'crypto';
 import { PointRequest } from '../dto/PointRequest';
 import { Point, PointSourceType, PointType } from '../entities/Point';
+import { UserNotFoundError } from '../errors';
 import { PointRepository } from '../repositories/PointRepository';
 import { ReviewRepository } from '../repositories/ReviewRepository';
+import { UserService } from './UserService';
 
 type CreatePointInstanceInput = {
   reviewId: string;
@@ -11,9 +13,17 @@ type CreatePointInstanceInput = {
 };
 
 export class PointCreateService {
-  constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
+  constructor(
+    private pointRepository: PointRepository,
+    private reviewRepository: ReviewRepository,
+    private userService: UserService,
+  ) {}
 
   async createPoint(req: PointRequest): Promise<Point[]> {
+    if (!(await this.userService.isUserExists(req.userId))) {
+      throw new UserNotFoundError();
+    }
+
     await this.checkDuplicatePoint(req.reviewId);
 
     const { reviewId, userId } = req;

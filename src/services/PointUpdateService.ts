@@ -1,13 +1,23 @@
 import { randomUUID } from 'crypto';
 import { PointRequest } from '../dto/PointRequest';
 import { Point, PointSourceType, PointType } from '../entities/Point';
+import { UserNotFoundError } from '../errors';
 import { PointRepository } from '../repositories/PointRepository';
 import { ReviewRepository } from '../repositories/ReviewRepository';
+import { UserService } from './UserService';
 
 export class PointUpdateService {
-  constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
+  constructor(
+    private pointRepository: PointRepository,
+    private reviewRepository: ReviewRepository,
+    private userService: UserService,
+  ) {}
 
   async updatePoint(req: PointRequest) {
+    if (!(await this.userService.isUserExists(req.userId))) {
+      throw new UserNotFoundError();
+    }
+
     const reviewPoints = await this.pointRepository.findByReviewId(req.reviewId);
     if (reviewPoints.length === 0) {
       throw new Error(`리뷰 포인트가 존재하지 않습니다. reviewId: ${req.reviewId}`);

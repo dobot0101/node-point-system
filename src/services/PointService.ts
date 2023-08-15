@@ -21,9 +21,6 @@ export class PointService {
     return this.pointUpdateService.updatePoint(req);
   }
 
-  /**
-   * 리뷰 삭제 시 포인트 차감
-   */
   async deductPoint(req: PointRequest) {
     return this.pointDeductService.deductPoint(req);
   }

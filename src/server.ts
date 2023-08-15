@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import { Container } from './container';
 import { AppDataSource } from './db';
-import { PermissionDeniedError, UnAuthenticatedError } from './errors';
+import { CustomError } from './errors';
 
 async function main() {
   if (!AppDataSource.isInitialized) {
@@ -37,10 +37,8 @@ main().catch((err) => {
 });
 
 function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction) {
-  if (err instanceof UnAuthenticatedError) {
-    res.status(401).send({ error: 'Unauthenticated' });
-  } else if (err instanceof PermissionDeniedError) {
-    res.status(403).send({ error: 'Permission Denied' });
+  if (err instanceof CustomError) {
+    res.status(err.getStatusCode()).send({ error: err.message });
   } else {
     let errorMessage;
     if (err instanceof Error) {
