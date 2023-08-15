@@ -1,9 +1,9 @@
-import { AppDataSource } from '../../../db';
+import { dataSource } from '../../../db';
 import { Point } from '../entity/Point';
 
 export class PointRepository {
   async findByReviewId(reviewId: string) {
-    return await AppDataSource.getRepository(Point).find({
+    return await dataSource.getRepository(Point).find({
       where: {
         reviewId,
       },
@@ -11,7 +11,7 @@ export class PointRepository {
   }
 
   async findByUserId(userId: string) {
-    return await AppDataSource.getRepository(Point).find({
+    return await dataSource.getRepository(Point).find({
       where: {
         userId,
       },
@@ -19,6 +19,6 @@ export class PointRepository {
   }
 
   async save(...points: Point[]) {
-    await AppDataSource.getRepository(Point).save(points);
+    await dataSource.getRepository(Point).save(points);
   }
 }

@@ -16,6 +16,6 @@ export class PointRequest {
   // @IsString()
   // memo!: string;
 
-  @IsNumber()
-  amount!: number;
+  // @IsNumber()
+  // amount!: number;
 }

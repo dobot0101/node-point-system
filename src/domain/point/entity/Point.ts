@@ -38,7 +38,7 @@ export class Point {
   sourceType!: PointSourceType;
 
   // @Column('uuid') sourceId!: string;
-  @Column('timestamp') createdAt!: Date;
+  @Column('timestamptz') createdAt!: Date;
 
   @ManyToOne(() => User)
   userId!: string;

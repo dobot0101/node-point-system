@@ -1,26 +1,26 @@
-import { AppDataSource } from '../../../db';
+import { dataSource } from '../../../db';
 import { User } from '../entity/User';
 
 export class UserRepository {
   async save(...users: User[]) {
-    return await AppDataSource.getRepository(User).save(users);
+    return await dataSource.getRepository(User).save(users);
   }
   async findById(userId: string) {
-    return await AppDataSource.getRepository(User).findOne({
+    return await dataSource.getRepository(User).findOne({
       where: {
         id: userId,
       },
     });
   }
   async findByEmail(email: string) {
-    return await AppDataSource.getRepository(User).findOne({
+    return await dataSource.getRepository(User).findOne({
       where: {
         email,
       },
     });
   }
   async findByIdAndPassword(id: string, password: string) {
-    return await AppDataSource.getRepository(User).find({
+    return await dataSource.getRepository(User).find({
       where: {
         email: id,
         password,

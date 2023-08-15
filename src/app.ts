@@ -1,13 +1,18 @@
 import express, { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import { Container } from './container';
-import { AppDataSource } from './db';
+import { dataSource } from './db';
 import { CustomError } from './error/errors';
+import { User } from './domain/user/entity/User';
+import { randomUUID } from 'crypto';
+import bcrypt from 'bcrypt';
 
 async function main() {
-  if (!AppDataSource.isInitialized) {
-    await AppDataSource.initialize();
+  if (!dataSource.isInitialized) {
+    await dataSource.initialize();
   }
+
+  await createDefaultData();
 
   const port = 3000;
 
@@ -47,5 +52,24 @@ function errorHandler(err: unknown, req: Request, res: Response, next: NextFunct
       errorMessage = err as string;
     }
     res.status(500).json({ success: false, error: errorMessage });
+  }
+}
+
+async function createDefaultData() {
+  const userRepository = dataSource.getRepository(User);
+  const users = await userRepository.findBy({
+    isAdmin: true,
+  });
+  if (users.length === 0) {
+    const hashedPassword = await bcrypt.hash('test', 10);
+    await userRepository.save(
+      new User({
+        id: randomUUID(),
+        createdAt: new Date(),
+        email: 'test@test.com',
+        isAdmin: true,
+        password: hashedPassword,
+      }),
+    );
   }
 }

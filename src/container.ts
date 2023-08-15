@@ -6,10 +6,10 @@ import { PointCreateService } from './domain/point/service/PointCreateService';
 import { PointDeductService } from './domain/point/service/PointDeductService';
 import { PointService } from './domain/point/service/PointService';
 import { PointUpdateService } from './domain/point/service/PointUpdateService';
+import { ReviewRepository } from './domain/review/repository/ReviewRepository';
 import { UserRepository } from './domain/user/repository/UserRepository';
 import { PermissionService } from './domain/user/service/PermissionService';
 import { UserService } from './domain/user/service/UserService';
-import { ReviewRepository } from './domain/review/repository/ReviewRepository';
 import { AuthRoute } from './routes/AuthRoute';
 import { PointRoute } from './routes/PointRoute';
 

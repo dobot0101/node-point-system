@@ -7,7 +7,7 @@ export class User {
   }
   @PrimaryColumn('uuid') id!: string;
   @Column('varchar', { length: 30, unique: true }) email!: string;
-  @Column('varchar', { length: 30 }) password!: string;
+  @Column('text') password!: string;
   @Column('boolean', { default: false }) isAdmin!: boolean;
-  @Column('timestamp') createdAt!: Date;
+  @Column('timestamptz') createdAt!: Date;
 }

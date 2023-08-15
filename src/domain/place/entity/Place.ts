@@ -1,9 +1,10 @@
-import { Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { Review } from '../../review/entity/Review';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Place {
+  constructor(data: Partial<Place>) {
+    return Object.assign(this, data);
+  }
   @PrimaryColumn('uuid') id!: string;
-  @OneToMany(() => Review, (review) => review.place)
-  review!: Review;
+  @Column('text') title!: string;
 }
