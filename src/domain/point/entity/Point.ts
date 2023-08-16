@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Review } from '../../review/entity/Review';
 import { User } from '../../user/entity/User';
 
@@ -37,13 +37,17 @@ export class Point {
   })
   sourceType!: PointSourceType;
 
-  // @Column('uuid') sourceId!: string;
   @Column('timestamptz') createdAt!: Date;
 
   @ManyToOne(() => User)
+  user!: User;
+
+  @Column('uuid')
   userId!: string;
 
   @ManyToOne(() => Review)
   review!: Review;
+
+  @Column('uuid')
   reviewId!: string;
 }

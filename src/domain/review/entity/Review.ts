@@ -14,10 +14,15 @@ export class Review {
   @Column('timestamptz', { nullable: true }) modifiedAt!: Date | null;
 
   @ManyToOne(() => User)
+  user!: User;
+
+  @Column('uuid')
   userId!: string;
 
   @ManyToOne(() => Place)
   place!: Place;
+
+  @Column('uuid')
   placeId!: string;
 
   @OneToMany(() => ReviewPhoto, (photo) => photo.review, {

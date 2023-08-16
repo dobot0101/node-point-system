@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { randomUUID } from 'crypto';
+import { DataSource } from 'typeorm';
 import { Container } from '../container';
 import { dataSource } from '../db';
 import { Place } from '../domain/place/entity/Place';
@@ -10,10 +10,23 @@ import { User } from '../domain/user/entity/User';
 describe('PointService 테스트', () => {
   const container = new Container();
 
+  let ds: DataSource;
+  beforeAll(async () => {
+    try {
+      ds = await dataSource.initialize();
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  afterAll(async () => {
+    await ds.destroy();
+  });
+
   test('포토, 장소 리뷰를 작성하면 총 3개의 포인트가 생성돼야한다.', async () => {
     const place = new Place({ id: randomUUID(), title: 'test place' });
-    const savedPlace = await dataSource.getRepository(Place).save(place);
-    const adminUser = await dataSource.getRepository(User).findOne({
+    const savedPlace = await ds.getRepository(Place).save(place);
+    const adminUser = await ds.getRepository(User).findOne({
       where: {
         isAdmin: true,
       },
@@ -36,7 +49,7 @@ describe('PointService 테스트', () => {
       userId: adminUser.id,
     });
 
-    const savedReview = await dataSource.getRepository(Review).save(review);
+    const savedReview = await ds.getRepository(Review).save(review);
 
     const points = await container.pointService.createPoint({
       reviewId: savedReview.id,

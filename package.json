@@ -9,6 +9,7 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "test": "jest --forceExit --runInBand --coverage",
+    "test:d": "docker compose exec node-app npm test",
     "dev": "tsc --watch --preserveWatchOutput & nodemon --enable-source-maps -w dist/ --delay 500ms dist/app.js"
   },
   "author": "",

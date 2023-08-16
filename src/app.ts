@@ -1,11 +1,11 @@
+import bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
 import express, { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import { Container } from './container';
 import { dataSource } from './db';
-import { CustomError } from './error/errors';
 import { User } from './domain/user/entity/User';
-import { randomUUID } from 'crypto';
-import bcrypt from 'bcrypt';
+import { CustomError } from './error/errors';
 
 async function main() {
   if (!dataSource.isInitialized) {
