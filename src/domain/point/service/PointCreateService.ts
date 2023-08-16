@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { Context } from '../../../context';
 import { UserNotFoundError } from '../../../error/errors';
 import { ReviewRepository } from '../../review/repository/ReviewRepository';
 import { UserService } from '../../user/service/UserService';
@@ -19,12 +20,12 @@ export class PointCreateService {
     private userService: UserService,
   ) {}
 
-  async createPoint(req: PointRequest): Promise<Point[]> {
-    if (!(await this.userService.isUserExists(req.userId))) {
+  async createPoint(ctx: Context, req: PointRequest): Promise<Point[]> {
+    if (!(await this.userService.isUserExists(ctx, req.userId))) {
       throw new UserNotFoundError();
     }
 
-    await this.checkDuplicatePoint(req.reviewId);
+    await this.checkDuplicatePoint(ctx, req.reviewId);
 
     const { reviewId, userId } = req;
 
@@ -39,7 +40,7 @@ export class PointCreateService {
     );
 
     // 이미지 첨부했으면 포토 리뷰 포인트 추가
-    const review = await this.reviewRepository.findById(reviewId);
+    const review = await this.reviewRepository.findById(ctx, reviewId);
     if (!review) {
       throw new Error(`Review not found. reviewId: ${reviewId}`);
     }
@@ -55,7 +56,7 @@ export class PointCreateService {
 
     // 3. 해당 장소의 첫번째 리뷰이면 보너스 포인트 지급
     if (req.placeId) {
-      const reviews = await this.reviewRepository.findByPlaceIdAndUserId(req.placeId, userId);
+      const reviews = await this.reviewRepository.findByPlaceIdAndUserId(ctx, req.placeId, userId);
       if (reviews.length === 1) {
         points.push(
           this.createPointInstance({
@@ -67,13 +68,13 @@ export class PointCreateService {
       }
     }
 
-    await this.pointRepository.save(...points);
+    await this.pointRepository.save(ctx, ...points);
 
     return points;
   }
 
-  private async checkDuplicatePoint(reviewId: string) {
-    const existingPoints = await this.pointRepository.findByReviewId(reviewId);
+  private async checkDuplicatePoint(ctx: Context, reviewId: string) {
+    const existingPoints = await this.pointRepository.findByReviewId(ctx, reviewId);
     if (existingPoints.length > 0) {
       throw new Error('이미 포인트가 지급되었습니다.');
     }

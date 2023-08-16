@@ -3,9 +3,10 @@ import { randomUUID } from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 import { sign, verify } from 'jsonwebtoken';
 import { configs } from '../../../config';
+import { Context } from '../../../context';
+import { UnAuthenticatedError } from '../../../error/errors';
 import { CreateUserDto } from '../../user/dto/CreateUserDto';
 import { User } from '../../user/entity/User';
-import { UnAuthenticatedError } from '../../../error/errors';
 import { UserRepository } from '../../user/repository/UserRepository';
 
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
 
       const token = authorization.split(' ')[1];
       const { userId } = verify(token, configs.JWT_SECRET_KEY) as DataStoredInToken;
-      const user = await this.userRepository.findById(userId);
+      const user = await this.userRepository.findById(req.context, userId);
       if (!user) {
         throw new UnAuthenticatedError();
       }
@@ -30,9 +31,9 @@ export class AuthService {
     }
   }
 
-  async signUp(createUserDto: CreateUserDto) {
+  async signUp(ctx: Context, createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
-    const existingUser = await this.userRepository.findByEmail(email);
+    const existingUser = await this.userRepository.findByEmail(ctx, email);
     if (existingUser) {
       throw new Error(`이미 회원가입된 이메일입니다.`);
     }
@@ -46,11 +47,11 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    return await this.userRepository.save(user);
+    return await this.userRepository.save(ctx, user);
   }
 
-  async login(data: CreateUserDto) {
-    const user = await this.userRepository.findByEmail(data.email);
+  async login(ctx: Context, data: CreateUserDto) {
+    const user = await this.userRepository.findByEmail(ctx, data.email);
     if (!user) {
       throw new Error('회원이 존재하지 않습니다.');
     }

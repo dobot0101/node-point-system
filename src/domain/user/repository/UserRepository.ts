@@ -1,30 +1,35 @@
-import { dataSource } from '../../../db';
+import { Context } from '../../../context';
+import { getTypeOrmDataSource } from '../../../db';
 import { User } from '../entity/User';
 
 export class UserRepository {
-  async save(...users: User[]) {
-    return await dataSource.getRepository(User).save(users);
+  async save(ctx: Context, ...users: User[]) {
+    return await getTypeOrmDataSource(ctx).getRepository(User).save(users);
   }
-  async findById(userId: string) {
-    return await dataSource.getRepository(User).findOne({
-      where: {
-        id: userId,
-      },
-    });
+  async findById(ctx: Context, userId: string) {
+    return await getTypeOrmDataSource(ctx)
+      .getRepository(User)
+      .findOne({
+        where: {
+          id: userId,
+        },
+      });
   }
-  async findByEmail(email: string) {
-    return await dataSource.getRepository(User).findOne({
+  async findByEmail(ctx: Context, email: string) {
+    return await getTypeOrmDataSource(ctx).getRepository(User).findOne({
       where: {
         email,
       },
     });
   }
-  async findByIdAndPassword(id: string, password: string) {
-    return await dataSource.getRepository(User).find({
-      where: {
-        email: id,
-        password,
-      },
-    });
+  async findByIdAndPassword(ctx: Context, id: string, password: string) {
+    return await getTypeOrmDataSource(ctx)
+      .getRepository(User)
+      .find({
+        where: {
+          email: id,
+          password,
+        },
+      });
   }
 }

@@ -1,24 +1,25 @@
-import { dataSource } from '../../../db';
+import { Context } from '../../../context';
+import { getTypeOrmDataSource } from '../../../db';
 import { Point } from '../entity/Point';
 
 export class PointRepository {
-  async findByReviewId(reviewId: string) {
-    return await dataSource.getRepository(Point).find({
+  async findByReviewId(ctx: Context, reviewId: string) {
+    return await getTypeOrmDataSource(ctx).getRepository(Point).find({
       where: {
         reviewId,
       },
     });
   }
 
-  async findByUserId(userId: string) {
-    return await dataSource.getRepository(Point).find({
+  async findByUserId(ctx: Context, userId: string) {
+    return await getTypeOrmDataSource(ctx).getRepository(Point).find({
       where: {
         userId,
       },
     });
   }
 
-  async save(...points: Point[]) {
-    await dataSource.getRepository(Point).save(points);
+  async save(ctx: Context, ...points: Point[]) {
+    await getTypeOrmDataSource(ctx).getRepository(Point).save(points);
   }
 }

@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { Context } from '../../../context';
 import { UserNotFoundError } from '../../../error/errors';
 import { UserService } from '../../user/service/UserService';
 import { PointRequest } from '../dto/PointRequest';
@@ -8,12 +9,12 @@ import { PointRepository } from '../repository/PointRepository';
 export class PointDeductService {
   constructor(private pointRepository: PointRepository, private userService: UserService) {}
 
-  async deductPoint(req: PointRequest) {
-    if (!(await this.userService.isUserExists(req.userId))) {
+  async deductPoint(ctx: Context, req: PointRequest) {
+    if (!(await this.userService.isUserExists(ctx, req.userId))) {
       throw new UserNotFoundError();
     }
 
-    const userPoints = await this.pointRepository.findByUserId(req.userId);
+    const userPoints = await this.pointRepository.findByUserId(ctx, req.userId);
     const totalRemainingPoints = userPoints.reduce(
       (acc, point) => (point.type === PointType.ISSUANCE ? acc + point.amount : acc - point.amount),
       0,
@@ -41,7 +42,7 @@ export class PointDeductService {
       createdAt: new Date(),
     });
 
-    await this.pointRepository.save(point);
+    await this.pointRepository.save(ctx, point);
 
     return point;
   }

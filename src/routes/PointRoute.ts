@@ -2,6 +2,7 @@ import express from 'express';
 import { AuthService } from '../domain/auth/service/AuthService';
 import { PointService } from '../domain/point/service/PointService';
 import { PermissionService } from '../domain/user/service/PermissionService';
+import { PermissionDeniedError } from '../error/errors';
 
 export class PointRoute {
   private router;
@@ -17,19 +18,22 @@ export class PointRoute {
      */
     this.router.post('/', this.authService.auth, async (req, res, next) => {
       try {
-        await this.permissionService.mustBeAdmin(req.userId!);
-        const { body } = req;
+        const { body, context, userId } = req;
+        if (!userId) {
+          throw new PermissionDeniedError();
+        }
+        await this.permissionService.mustBeAdmin(context, userId);
 
         let result = false;
         switch (req.body.action) {
           case 'ADD':
-            await this.pointService.createPoint(body);
+            await this.pointService.createPoint(context, body);
             break;
           case 'MOD':
-            await this.pointService.updatePoint(body);
+            await this.pointService.updatePoint(context, body);
             break;
           case 'DELETE':
-            await this.pointService.deductPoint(body);
+            await this.pointService.deductPoint(context, body);
             break;
           default:
             throw new Error('invalid action');
@@ -48,8 +52,8 @@ export class PointRoute {
     this.router.get('/:userId/list', this.authService.auth, async (req, res, next) => {
       try {
         const { userId } = req.params;
-        await this.permissionService.mustBeAdmin(userId);
-        const pointList = await this.pointService.getPointByUserId(userId);
+        await this.permissionService.mustBeAdmin(req.context, userId);
+        const pointList = await this.pointService.getPointByUserId(req.context, userId);
         res.status(200).json({ success: true, pointList });
       } catch (error) {
         next(error);
@@ -63,8 +67,8 @@ export class PointRoute {
     this.router.get('/:userId/total', this.authService.auth, async (req, res, next) => {
       try {
         const { userId } = req.params;
-        await this.permissionService.mustBeAdmin(userId);
-        const totalPoint = await this.pointService.getTotalPointByUserId(userId);
+        await this.permissionService.mustBeAdmin(req.context, userId);
+        const totalPoint = await this.pointService.getTotalPointByUserId(req.context, userId);
         res.status(200).json({ success: true, totalPoint });
       } catch (error) {
         next(error);

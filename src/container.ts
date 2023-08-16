@@ -1,4 +1,5 @@
 import { configs } from './config';
+import { Context } from './context';
 import { AuthService } from './domain/auth/service/AuthService';
 import { JwtService } from './domain/auth/service/JwtService';
 import { PointRepository } from './domain/point/repository/PointRepository';
@@ -14,6 +15,7 @@ import { AuthRoute } from './routes/AuthRoute';
 import { PointRoute } from './routes/PointRoute';
 
 export class Container {
+  constructor() {}
   // repository
   public pointRepository = new PointRepository();
   public reviewRepository = new ReviewRepository();

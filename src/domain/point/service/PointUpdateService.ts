@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { Context } from '../../../context';
 import { UserNotFoundError } from '../../../error/errors';
 import { ReviewRepository } from '../../review/repository/ReviewRepository';
 import { UserService } from '../../user/service/UserService';
@@ -13,22 +14,22 @@ export class PointUpdateService {
     private userService: UserService,
   ) {}
 
-  async updatePoint(req: PointRequest) {
-    if (!(await this.userService.isUserExists(req.userId))) {
+  async updatePoint(ctx: Context, req: PointRequest) {
+    if (!(await this.userService.isUserExists(ctx, req.userId))) {
       throw new UserNotFoundError();
     }
 
-    const reviewPoints = await this.pointRepository.findByReviewId(req.reviewId);
+    const reviewPoints = await this.pointRepository.findByReviewId(ctx, req.reviewId);
     if (reviewPoints.length === 0) {
       throw new Error(`리뷰 포인트가 존재하지 않습니다. reviewId: ${req.reviewId}`);
     }
 
-    const userPoints = await this.pointRepository.findByUserId(req.userId);
+    const userPoints = await this.pointRepository.findByUserId(ctx, req.userId);
     if (userPoints.length === 0) {
       throw new Error(`유저 포인트가 존재하지 않습니다.`);
     }
 
-    const review = await this.reviewRepository.findById(req.reviewId);
+    const review = await this.reviewRepository.findById(ctx, req.reviewId);
     if (!review) {
       throw new Error(`리뷰가 존재하지 않습니다.`);
     }
@@ -107,6 +108,6 @@ export class PointUpdateService {
       }
     }
 
-    await this.pointRepository.save(...pointsToSave);
+    await this.pointRepository.save(ctx, ...pointsToSave);
   }
 }

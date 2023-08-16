@@ -1,3 +1,4 @@
+import { Context } from '../../../context';
 import { PointRequest } from '../dto/PointRequest';
 import { Point } from '../entity/Point';
 import { PointRepository } from '../repository/PointRepository';
@@ -13,24 +14,24 @@ export class PointService {
     private pointRepository: PointRepository,
   ) {}
 
-  async createPoint(req: PointRequest): Promise<Point[]> {
-    return this.pointCreateService.createPoint(req);
+  async createPoint(ctx: Context, req: PointRequest): Promise<Point[]> {
+    return this.pointCreateService.createPoint(ctx, req);
   }
 
-  async updatePoint(req: PointRequest) {
-    return this.pointUpdateService.updatePoint(req);
+  async updatePoint(ctx: Context, req: PointRequest) {
+    return this.pointUpdateService.updatePoint(ctx, req);
   }
 
-  async deductPoint(req: PointRequest) {
-    return this.pointDeductService.deductPoint(req);
+  async deductPoint(ctx: Context, req: PointRequest) {
+    return this.pointDeductService.deductPoint(ctx, req);
   }
 
-  async getPointByUserId(userId: string) {
-    return await this.pointRepository.findByUserId(userId);
+  async getPointByUserId(ctx: Context, userId: string) {
+    return await this.pointRepository.findByUserId(ctx, userId);
   }
 
-  async getTotalPointByUserId(userId: string) {
-    const points = await this.pointRepository.findByUserId(userId);
+  async getTotalPointByUserId(ctx: Context, userId: string) {
+    const points = await this.pointRepository.findByUserId(ctx, userId);
     return points.reduce((acc, point) => acc + point.amount, 0);
   }
 }

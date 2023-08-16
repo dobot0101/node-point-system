@@ -1,4 +1,5 @@
-import { dataSource } from '../../../db';
+import { Context } from '../../../context';
+import { getTypeOrmDataSource } from '../../../db';
 import { Review } from '../entity/Review';
 
 // typeorm 공식 문서에서 안내하는 custom repository 만드는 방법
@@ -12,15 +13,16 @@ import { Review } from '../entity/Review';
 // });
 
 export class ReviewRepository {
-  async findById(id: string) {
-    return await dataSource.getRepository(Review).findOne({
+  async findById(ctx: Context, id: string) {
+    return await getTypeOrmDataSource(ctx).getRepository(Review).findOne({
       where: {
         id,
       },
     });
   }
-  async findByPlaceIdAndUserId(placeId: string, userId: string) {
-    return await dataSource.getRepository(Review).find({
+
+  async findByPlaceIdAndUserId(ctx: Context, placeId: string, userId: string) {
+    return await getTypeOrmDataSource(ctx).getRepository(Review).find({
       where: {
         placeId,
         userId,

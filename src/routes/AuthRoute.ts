@@ -5,6 +5,10 @@ import { JwtService } from '../domain/auth/service/JwtService';
 import { CreateUserDto } from '../domain/user/dto/CreateUserDto';
 import { BadRequestError } from '../error/errors';
 
+export class ContextManager {
+  getOrCreateContext(req: Request) {}
+}
+
 export class AuthRoute {
   private router;
   constructor(private authService: AuthService, private jwtService: JwtService) {
@@ -13,7 +17,7 @@ export class AuthRoute {
     this.router.post('/login', async (req, res, next) => {
       try {
         const userData: CreateUserDto = req.body;
-        const { cookie, user } = await this.authService.login(userData);
+        const { cookie, user } = await this.authService.login(req.context, userData);
 
         res.setHeader('Set-Cookie', [cookie]);
         res.status(200).json({ data: user, message: 'login' });
@@ -34,7 +38,7 @@ export class AuthRoute {
           throw new BadRequestError(getErrorMessageFromValidationErrors(errors));
         }
 
-        const user = await this.authService.signUp(createUserDto);
+        const user = await this.authService.signUp(req.context, createUserDto);
         res.status(201).json({ data: user, message: 'signed up' });
         res.json(user);
       } catch (error) {
