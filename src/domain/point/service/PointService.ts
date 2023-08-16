@@ -2,7 +2,7 @@ import { Context } from '../../../context';
 import { DeductPointRequest } from '../dto/DeductPointRequest';
 import { CreatePointRequest } from '../dto/CreatePointRequest';
 import { UpdatePointRequest } from '../dto/UpdatePointRequest';
-import { Point } from '../entity/Point';
+import { Point, PointType } from '../entity/Point';
 import { PointRepository } from '../repository/PointRepository';
 import { PointCreateService } from './PointCreateService';
 import { PointDeductService } from './PointDeductService';
@@ -34,6 +34,9 @@ export class PointService {
 
   async getTotalPointByUserId(ctx: Context, userId: string) {
     const points = await this.pointRepository.findByUserId(ctx, userId);
-    return points.reduce((acc, point) => acc + point.amount, 0);
+    return points.reduce(
+      (acc, point) => (point.type === PointType.ISSUANCE ? acc + point.amount : acc - point.amount),
+      0,
+    );
   }
 }

@@ -27,12 +27,15 @@ export class PointRoute {
         let result = false;
         switch (req.body.action) {
           case 'ADD':
+            // 포인트 지급
             await this.pointService.createPoint(context, body);
             break;
           case 'MOD':
+            // 포인트 수정
             await this.pointService.updatePoint(context, body);
             break;
           case 'DELETE':
+            // 포인트 취소
             await this.pointService.deductPoint(context, body);
             break;
           default:
@@ -46,9 +49,8 @@ export class PointRoute {
     });
 
     /**
-     * 유저 아이디로 포인트 목록 조회
+     * 특정 회원의 포인트 목록 조회
      */
-    // this.router.get('/:userId/list', convertUUIDInRequestParam, async (req, res) => {
     this.router.get('/:userId/list', this.authService.auth, async (req, res, next) => {
       try {
         const { userId } = req.params;
@@ -61,9 +63,8 @@ export class PointRoute {
     });
 
     /**
-     * 유저 아이디로 총 포인트 조회
+     * 특정 회원의 보유 포인트 조회
      */
-    // this.router.get('/:userId/total', convertUUIDInRequestParam, async (req, res) => {
     this.router.get('/:userId/total', this.authService.auth, async (req, res, next) => {
       try {
         const { userId } = req.params;
