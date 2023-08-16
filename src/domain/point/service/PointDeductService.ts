@@ -2,14 +2,14 @@ import { randomUUID } from 'crypto';
 import { Context } from '../../../context';
 import { UserNotFoundError } from '../../../error/errors';
 import { UserService } from '../../user/service/UserService';
-import { PointRequest } from '../dto/PointRequest';
+import { DeductPointRequest } from '../dto/DeductPointRequest';
 import { Point, PointSourceType, PointType } from '../entity/Point';
 import { PointRepository } from '../repository/PointRepository';
 
 export class PointDeductService {
   constructor(private pointRepository: PointRepository, private userService: UserService) {}
 
-  async deductPoint(ctx: Context, req: PointRequest) {
+  async deductPoint(ctx: Context, req: DeductPointRequest) {
     if (!(await this.userService.isUserExists(ctx, req.userId))) {
       throw new UserNotFoundError();
     }

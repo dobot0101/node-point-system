@@ -1,6 +1,6 @@
-import { IsNumber, IsUUID } from 'class-validator';
+import { IsUUID } from 'class-validator';
 
-export class PointRequest {
+export class CreatePointRequest {
   @IsUUID()
   userId!: string;
 

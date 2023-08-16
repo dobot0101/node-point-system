@@ -1,5 +1,7 @@
 import { Context } from '../../../context';
-import { PointRequest } from '../dto/PointRequest';
+import { DeductPointRequest } from '../dto/DeductPointRequest';
+import { CreatePointRequest } from '../dto/CreatePointRequest';
+import { UpdatePointRequest } from '../dto/UpdatePointRequest';
 import { Point } from '../entity/Point';
 import { PointRepository } from '../repository/PointRepository';
 import { PointCreateService } from './PointCreateService';
@@ -14,19 +16,19 @@ export class PointService {
     private pointRepository: PointRepository,
   ) {}
 
-  async createPoint(ctx: Context, req: PointRequest): Promise<Point[]> {
+  async createPoint(ctx: Context, req: CreatePointRequest): Promise<Point[]> {
     return this.pointCreateService.createPoint(ctx, req);
   }
 
-  async updatePoint(ctx: Context, req: PointRequest) {
+  async updatePoint(ctx: Context, req: UpdatePointRequest) {
     return this.pointUpdateService.updatePoint(ctx, req);
   }
 
-  async deductPoint(ctx: Context, req: PointRequest) {
+  async deductPoint(ctx: Context, req: DeductPointRequest) {
     return this.pointDeductService.deductPoint(ctx, req);
   }
 
-  async getPointByUserId(ctx: Context, userId: string) {
+  async getPointsByUserId(ctx: Context, userId: string) {
     return await this.pointRepository.findByUserId(ctx, userId);
   }
 

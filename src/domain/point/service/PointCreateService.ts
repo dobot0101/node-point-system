@@ -3,7 +3,7 @@ import { Context } from '../../../context';
 import { UserNotFoundError } from '../../../error/errors';
 import { ReviewRepository } from '../../review/repository/ReviewRepository';
 import { UserService } from '../../user/service/UserService';
-import { PointRequest } from '../dto/PointRequest';
+import { CreatePointRequest } from '../dto/CreatePointRequest';
 import { Point, PointSourceType, PointType } from '../entity/Point';
 import { PointRepository } from '../repository/PointRepository';
 
@@ -20,7 +20,7 @@ export class PointCreateService {
     private userService: UserService,
   ) {}
 
-  async createPoint(ctx: Context, req: PointRequest): Promise<Point[]> {
+  async createPoint(ctx: Context, req: CreatePointRequest): Promise<Point[]> {
     if (!(await this.userService.isUserExists(ctx, req.userId))) {
       throw new UserNotFoundError();
     }

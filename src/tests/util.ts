@@ -1,8 +1,8 @@
 import { Context } from '../context';
-import { dataSource, setTypeOrmDataSource } from '../db';
+import { initTypeOrmDataSource, setTypeOrmDataSource } from '../db';
 
 export async function runTestInTransaction(ctx: Context, func: (ctx: Context) => any) {
-  const ds = await dataSource.initialize();
+  const ds = await initTypeOrmDataSource();
   const qr = ds.createQueryRunner();
   await qr.startTransaction();
   setTypeOrmDataSource(ctx, qr.manager);

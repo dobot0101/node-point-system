@@ -3,9 +3,9 @@ import { Context } from '../../../context';
 import { UserNotFoundError } from '../../../error/errors';
 import { ReviewRepository } from '../../review/repository/ReviewRepository';
 import { UserService } from '../../user/service/UserService';
-import { PointRequest } from '../dto/PointRequest';
 import { Point, PointSourceType, PointType } from '../entity/Point';
 import { PointRepository } from '../repository/PointRepository';
+import { UpdatePointRequest } from '../dto/UpdatePointRequest';
 
 export class PointUpdateService {
   constructor(
@@ -14,7 +14,7 @@ export class PointUpdateService {
     private userService: UserService,
   ) {}
 
-  async updatePoint(ctx: Context, req: PointRequest) {
+  async updatePoint(ctx: Context, req: UpdatePointRequest) {
     if (!(await this.userService.isUserExists(ctx, req.userId))) {
       throw new UserNotFoundError();
     }

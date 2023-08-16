@@ -60,5 +60,8 @@ export function setTypeOrmDataSource(ctx: Context, dataSource: DataSource | Enti
 }
 
 export async function initTypeOrmDataSource() {
+  if (dataSource.isInitialized) {
+    return dataSource;
+  }
   return await dataSource.initialize();
 }

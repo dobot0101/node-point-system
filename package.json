@@ -8,7 +8,8 @@
     "test:w": "npx jest --watch",
     "build": "tsc",
     "start": "node dist/app.js",
-    "test": "jest --forceExit --runInBand --coverage",
+    "test:opt": "jest --forceExit --runInBand --coverage",
+    "test": "jest",
     "test:d": "docker compose exec node-app npm test",
     "dev": "tsc --watch --preserveWatchOutput & nodemon --enable-source-maps -w dist/ --delay 500ms dist/app.js"
   },

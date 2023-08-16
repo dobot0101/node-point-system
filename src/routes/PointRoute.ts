@@ -53,7 +53,7 @@ export class PointRoute {
       try {
         const { userId } = req.params;
         await this.permissionService.mustBeAdmin(req.context, userId);
-        const pointList = await this.pointService.getPointByUserId(req.context, userId);
+        const pointList = await this.pointService.getPointsByUserId(req.context, userId);
         res.status(200).json({ success: true, pointList });
       } catch (error) {
         next(error);
