@@ -1,13 +1,13 @@
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { Container } from './container';
-import { Context } from './context';
 import { initTypeOrmDataSource } from './db';
 import { User } from './domain/user/entity/User';
-import { CustomError } from './error/errors';
+import { createContext } from './middleware/createContext';
+import { errorHandler } from './middleware/errorHandler';
 
 async function main() {
   const dataSource = await initTypeOrmDataSource();
@@ -25,10 +25,9 @@ async function main() {
       extended: false,
     }),
   );
-  app.use(createContext());
+  app.use(createContext);
   app.use('/users', container.userRoute.getRouter());
   app.use('/points', container.pointRoute.getRouter());
-
   app.use(errorHandler);
 
   app.listen(port, () => {
@@ -40,28 +39,6 @@ main().catch((err) => {
   console.error(err);
   process.exit();
 });
-
-function createContext() {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const context = new Context();
-    req.context = context;
-    next();
-  };
-}
-
-function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction) {
-  if (err instanceof CustomError) {
-    res.status(err.getStatusCode()).send({ error: err.message });
-  } else {
-    let errorMessage;
-    if (err instanceof Error) {
-      errorMessage = err.message;
-    } else {
-      errorMessage = err as string;
-    }
-    res.status(500).json({ success: false, error: errorMessage });
-  }
-}
 
 async function createDefaultData(dataSource: DataSource) {
   const userRepository = dataSource.getRepository(User);
