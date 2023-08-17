@@ -1,6 +1,6 @@
 import { Context } from '../../../context';
 import { PermissionDeniedError } from '../../../error/errors';
-import { UserRepository } from '../repository/UserRepository';
+import { UserRepository } from '../repository/interface/UserRepository';
 
 export class PermissionService {
   constructor(private userRepository: UserRepository) {}

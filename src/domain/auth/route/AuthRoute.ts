@@ -1,13 +1,9 @@
 import { ValidationError, validate } from 'class-validator';
 import express from 'express';
-import { AuthService } from '../domain/auth/service/AuthService';
-import { JwtService } from '../domain/auth/service/JwtService';
-import { CreateUserDto } from '../domain/user/dto/CreateUserDto';
-import { BadRequestError } from '../error/errors';
-
-export class ContextManager {
-  getOrCreateContext(req: Request) {}
-}
+import { AuthService } from '../service/AuthService';
+import { JwtService } from '../service/JwtService';
+import { CreateUserDto } from '../../user/dto/CreateUserDto';
+import { BadRequestError } from '../../../error/errors';
 
 export class AuthRoute {
   private router;

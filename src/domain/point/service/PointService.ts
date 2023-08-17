@@ -1,9 +1,8 @@
 import { Context } from '../../../context';
-import { DeductPointRequest } from '../dto/DeductPointRequest';
 import { CreatePointRequest } from '../dto/CreatePointRequest';
+import { DeductPointRequest } from '../dto/DeductPointRequest';
 import { UpdatePointRequest } from '../dto/UpdatePointRequest';
-import { Point, PointType } from '../entity/Point';
-import { PointRepository } from '../repository/PointRepository';
+import { Point } from '../entity/Point';
 import { PointCreateService } from './PointCreateService';
 import { PointDeductService } from './PointDeductService';
 import { PointUpdateService } from './PointUpdateService';
@@ -13,7 +12,6 @@ export class PointService {
     private pointCreateService: PointCreateService,
     private pointUpdateService: PointUpdateService,
     private pointDeductService: PointDeductService,
-    private pointRepository: PointRepository,
   ) {}
 
   async createPoint(ctx: Context, req: CreatePointRequest): Promise<Point[]> {
@@ -26,17 +24,5 @@ export class PointService {
 
   async deductPoint(ctx: Context, req: DeductPointRequest) {
     return this.pointDeductService.deductPoint(ctx, req);
-  }
-
-  async getPointsByUserId(ctx: Context, userId: string) {
-    return await this.pointRepository.findByUserId(ctx, userId);
-  }
-
-  async getTotalPointByUserId(ctx: Context, userId: string) {
-    const points = await this.pointRepository.findByUserId(ctx, userId);
-    return points.reduce(
-      (acc, point) => (point.type === PointType.ISSUANCE ? acc + point.amount : acc - point.amount),
-      0,
-    );
   }
 }

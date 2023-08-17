@@ -1,26 +1,20 @@
 import { randomUUID } from 'crypto';
 import { Context } from '../../../context';
-import { UserNotFoundError } from '../../../error/errors';
-import { UserService } from '../../user/service/UserService';
 import { DeductPointRequest } from '../dto/DeductPointRequest';
 import { Point, PointSourceType, PointType } from '../entity/Point';
-import { PointRepository } from '../repository/PointRepository';
+import { PointRepository } from '../repository/interface/PointRepository';
 
 export class PointDeductService {
-  constructor(private pointRepository: PointRepository, private userService: UserService) {}
+  constructor(private pointRepository: PointRepository) {}
 
-  async deductPoint(ctx: Context, req: DeductPointRequest) {
-    if (!(await this.userService.isUserExists(ctx, req.userId))) {
-      throw new UserNotFoundError();
-    }
-
-    const userPoints = await this.pointRepository.findByUserId(ctx, req.userId);
+  async deductPoint(ctx: Context, request: DeductPointRequest) {
+    const userPoints = await this.pointRepository.findByUserId(ctx, request.userId);
     const totalRemainingPoints = userPoints.reduce(
       (acc, point) => (point.type === PointType.ISSUANCE ? acc + point.amount : acc - point.amount),
       0,
     );
     const totalReviewPoints = userPoints
-      .filter((point) => point.reviewId === req.reviewId)
+      .filter((point) => point.reviewId === request.reviewId)
       .reduce((acc, point) => (point.type === PointType.ISSUANCE ? acc + point.amount : acc - point.amount), 0);
 
     /**
@@ -34,8 +28,8 @@ export class PointDeductService {
 
     const point = new Point({
       id: randomUUID(),
-      userId: req.userId,
-      reviewId: req.reviewId,
+      userId: request.userId,
+      reviewId: request.reviewId,
       sourceType: PointSourceType.CANCELED_REVIEW,
       type: PointType.SPENDING,
       amount: cancelPointAmount,

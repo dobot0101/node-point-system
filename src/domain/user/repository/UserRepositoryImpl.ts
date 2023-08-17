@@ -1,8 +1,9 @@
 import { Context } from '../../../context';
 import { getTypeOrmDataSource } from '../../../db';
 import { User } from '../entity/User';
+import { UserRepository } from './interface/UserRepository';
 
-export class UserRepository {
+export class UserRepositoryImpl implements UserRepository {
   async save(ctx: Context, ...users: User[]) {
     return await getTypeOrmDataSource(ctx).getRepository(User).save(users);
   }

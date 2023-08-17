@@ -1,8 +1,8 @@
 import express from 'express';
-import { AuthService } from '../domain/auth/service/AuthService';
-import { PointService } from '../domain/point/service/PointService';
-import { PermissionService } from '../domain/user/service/PermissionService';
-import { PermissionDeniedError } from '../error/errors';
+import { PermissionDeniedError } from '../../../error/errors';
+import { AuthService } from '../../auth/service/AuthService';
+import { PermissionService } from '../../user/service/PermissionService';
+import { PointService } from '../service/PointService';
 
 export class PointRoute {
   private router;
@@ -43,34 +43,6 @@ export class PointRoute {
         }
 
         res.status(200).json({ success: result });
-      } catch (error) {
-        next(error);
-      }
-    });
-
-    /**
-     * 특정 회원의 포인트 목록 조회
-     */
-    this.router.get('/:userId/list', this.authService.auth, async (req, res, next) => {
-      try {
-        const { userId } = req.params;
-        await this.permissionService.mustBeAdmin(req.context, userId);
-        const pointList = await this.pointService.getPointsByUserId(req.context, userId);
-        res.status(200).json({ success: true, pointList });
-      } catch (error) {
-        next(error);
-      }
-    });
-
-    /**
-     * 특정 회원의 보유 포인트 조회
-     */
-    this.router.get('/:userId/total', this.authService.auth, async (req, res, next) => {
-      try {
-        const { userId } = req.params;
-        await this.permissionService.mustBeAdmin(req.context, userId);
-        const totalPoint = await this.pointService.getTotalPointByUserId(req.context, userId);
-        res.status(200).json({ success: true, totalPoint });
       } catch (error) {
         next(error);
       }

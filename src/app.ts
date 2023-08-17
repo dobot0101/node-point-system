@@ -26,6 +26,7 @@ async function main() {
     }),
   );
   app.use(createContext);
+  app.use('/auth', container.authRoute.getRouter());
   app.use('/users', container.userRoute.getRouter());
   app.use('/points', container.pointRoute.getRouter());
   app.use(errorHandler);

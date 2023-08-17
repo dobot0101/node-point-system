@@ -4,11 +4,11 @@ import { Container } from '../container';
 import { Context } from '../context';
 import { getTypeOrmDataSource } from '../db';
 import { Place } from '../domain/place/entity/Place';
+import { PointType } from '../domain/point/entity/Point';
 import { Review } from '../domain/review/entity/Review';
 import { ReviewPhoto } from '../domain/review/entity/ReviewPhoto';
 import { User } from '../domain/user/entity/User';
 import { runTestInTransaction } from './util';
-import { PointType } from '../domain/point/entity/Point';
 
 describe('PointService 테스트', () => {
   const container = new Container();
@@ -25,17 +25,8 @@ describe('PointService 테스트', () => {
         userId: adminUser.id,
       });
 
-      const points = await container.pointService.getPointsByUserId(ctx, adminUser.id);
-      expect(points.length > 0).toBeTruthy();
-
-      const totalRemainingPoints = points.reduce((acc, val) => {
-        if (val.type === PointType.ISSUANCE) {
-          return acc + val.amount;
-        } else {
-          return acc - val.amount;
-        }
-      }, 0);
-      expect(totalRemainingPoints).toStrictEqual(0);
+      const point = await container.userService.getTotalPointByUserId(ctx, adminUser.id);
+      expect(point).toStrictEqual(0);
     });
   });
 
@@ -53,7 +44,7 @@ describe('PointService 테스트', () => {
         userId: adminUser.id,
       });
 
-      const points = await container.pointRepository.findByReviewId(ctx, savedReview.id);
+      const points = await container.pointRepositoryImpl.findByReviewId(ctx, savedReview.id);
       const foundPoint = points.find((point) => point.amount === 1 && point.type === PointType.SPENDING);
       expect(Boolean(foundPoint)).toBeTruthy();
 

@@ -7,7 +7,7 @@ import { Context } from '../../../context';
 import { UnAuthenticatedError } from '../../../error/errors';
 import { CreateUserDto } from '../../user/dto/CreateUserDto';
 import { User } from '../../user/entity/User';
-import { UserRepository } from '../../user/repository/UserRepository';
+import { UserRepository } from '../../user/repository/interface/UserRepository';
 
 export class AuthService {
   constructor(private userRepository: UserRepository) {}

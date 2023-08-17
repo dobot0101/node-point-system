@@ -1,11 +1,9 @@
 import { randomUUID } from 'crypto';
 import { Context } from '../../../context';
-import { UserNotFoundError } from '../../../error/errors';
-import { ReviewRepository } from '../../review/repository/ReviewRepository';
-import { UserService } from '../../user/service/UserService';
+import { ReviewRepository } from '../../review/repository/interface/ReviewRepository';
 import { CreatePointRequest } from '../dto/CreatePointRequest';
 import { Point, PointSourceType, PointType } from '../entity/Point';
-import { PointRepository } from '../repository/PointRepository';
+import { PointRepository } from '../repository/interface/PointRepository';
 
 type CreatePointInstanceInput = {
   reviewId: string;
@@ -14,20 +12,12 @@ type CreatePointInstanceInput = {
 };
 
 export class PointCreateService {
-  constructor(
-    private pointRepository: PointRepository,
-    private reviewRepository: ReviewRepository,
-    private userService: UserService,
-  ) {}
+  constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
 
-  async createPoint(ctx: Context, req: CreatePointRequest): Promise<Point[]> {
-    if (!(await this.userService.isUserExists(ctx, req.userId))) {
-      throw new UserNotFoundError();
-    }
+  async createPoint(ctx: Context, request: CreatePointRequest): Promise<Point[]> {
+    await this.checkDuplicatePoint(ctx, request.reviewId);
 
-    await this.checkDuplicatePoint(ctx, req.reviewId);
-
-    const { reviewId, userId } = req;
+    const { reviewId, userId } = request;
 
     const points = [];
 
@@ -55,8 +45,8 @@ export class PointCreateService {
     }
 
     // 3. 해당 장소의 첫번째 리뷰이면 보너스 포인트 지급
-    if (req.placeId) {
-      const reviews = await this.reviewRepository.findByPlaceIdAndUserId(ctx, req.placeId, userId);
+    if (request.placeId) {
+      const reviews = await this.reviewRepository.findByPlaceIdAndUserId(ctx, request.placeId, userId);
       if (reviews.length === 1) {
         points.push(
           this.createPointInstance({

@@ -1,6 +1,7 @@
 import { Context } from '../../../context';
 import { getTypeOrmDataSource } from '../../../db';
 import { Review } from '../entity/Review';
+import { ReviewRepository } from './interface/ReviewRepository';
 
 // typeorm 공식 문서에서 안내하는 custom repository 만드는 방법
 // export const reviewRepository = dataSource.getRepository(Review).extend({
@@ -12,7 +13,7 @@ import { Review } from '../entity/Review';
 //   },
 // });
 
-export class ReviewRepository {
+export class ReviewRepositoryImpl implements ReviewRepository {
   async findById(ctx: Context, id: string) {
     return await getTypeOrmDataSource(ctx).getRepository(Review).findOne({
       where: {
