@@ -1,7 +1,8 @@
-version: '3'
+version: '3.9'
 
 services:
   node-app:
+    container_name: node-app
     build:
       context: .
       dockerfile: Dockerfile
@@ -29,6 +30,7 @@ services:
   #     - db_data:/var/lib/mysql
 
   db:
+    container_name: db
     image: postgres:14-alpine
     environment:
       - POSTGRES_PASSWORD=28828bb8ec779fc98b63a323bcb644f49023af728bc84f7800f4e9
