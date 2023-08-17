@@ -23,7 +23,7 @@ export class UserRoute {
         }
         const { cursor, pageSize } = req.query;
 
-        await this.permissionService.mustBeAdmin(req.context, req.userId);
+        // await this.permissionService.mustBeAdmin(req.context, req.userId);
         const pointList = await this.userService.getPointsByUserId(req.context, {
           cursor: cursor ? cursor.toString() : undefined,
           pageSize: pageSize ? parseInt(pageSize.toString()) : 10,

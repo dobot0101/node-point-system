@@ -10,11 +10,20 @@ import { User } from '../../user/entity/User';
 import { UserRepository } from '../../user/repository/interface/UserRepository';
 
 export class AuthService {
-  constructor(private userRepository: UserRepository) {}
-  async auth(req: Request, res: Response, next: NextFunction) {
+  constructor(private userRepository: UserRepository) {
+    // this.auth = this.auth.bind(this);
+  }
+
+  /**
+   * 미들웨어로 사용되는 메서드의 경우 this의 컨텍스트가 변경돼서 this가 AuthService 클래스 인스턴스를 참조하지 않음
+   * 따라서 화살표 함수로 하지 않으면 this.userRepository를 사용하려고할 때 undefined property 에러가 발생함
+   * 이문제를 해결하려면 생성자에서 this를 bind하거나 아래와 같이 화살표 함수로 만들면 됨
+   */
+  public auth = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { authorization } = req.headers;
-      if (!authorization || authorization.startsWith('Bearer ')) {
+
+      if (!authorization || !authorization.startsWith('Bearer ')) {
         throw new UnAuthenticatedError();
       }
 
@@ -29,7 +38,7 @@ export class AuthService {
     } catch (error) {
       next(error);
     }
-  }
+  };
 
   async signUp(ctx: Context, createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;

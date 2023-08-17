@@ -16,7 +16,7 @@ export class AuthRoute {
         const { cookie, user } = await this.authService.login(req.context, userData);
 
         res.setHeader('Set-Cookie', [cookie]);
-        res.status(200).json({ data: user, message: 'login' });
+        res.status(200).json({ data: user, message: '로그인 성공' });
       } catch (error) {
         next(error);
       }
@@ -35,8 +35,7 @@ export class AuthRoute {
         }
 
         const user = await this.authService.signUp(req.context, createUserDto);
-        res.status(201).json({ data: user, message: 'signed up' });
-        res.json(user);
+        res.status(201).json({ data: user, message: '회원가입 성공' });
       } catch (error) {
         next(error);
       }
