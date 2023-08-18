@@ -72,7 +72,7 @@ export class AuthService {
 
     const tokenData = await this.createToken(user);
     const cookie = await this.createCookie(tokenData);
-    return { user, cookie };
+    return { user, cookie, tokenData };
   }
 
   public createToken(user: User): TokenData {

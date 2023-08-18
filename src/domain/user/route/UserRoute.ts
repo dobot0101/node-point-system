@@ -43,7 +43,7 @@ export class UserRoute {
       try {
         const { userId } = req.params;
 
-        await this.permissionService.mustBeAdmin(req.context, userId);
+        // await this.permissionService.mustBeAdmin(req.context, userId);
         const totalPoint = await this.userService.getTotalPointByUserId(req.context, userId);
         res.status(200).json({ success: true, totalPoint });
       } catch (error) {

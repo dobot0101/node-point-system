@@ -13,10 +13,10 @@ export class AuthRoute {
     this.router.post('/login', async (req, res, next) => {
       try {
         const userData: CreateUserDto = req.body;
-        const { cookie, user } = await this.authService.login(req.context, userData);
+        const { cookie, tokenData } = await this.authService.login(req.context, userData);
 
         res.setHeader('Set-Cookie', [cookie]);
-        res.status(200).json({ data: user, message: '로그인 성공' });
+        res.status(200).json({ data: tokenData, message: '로그인 성공' });
       } catch (error) {
         next(error);
       }
