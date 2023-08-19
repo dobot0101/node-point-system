@@ -13,15 +13,16 @@
      - post /auth/register
    - 로그인
      - post /auth/login
-     - 로그인 성공 시 Authorization 쿠키를 생성해서 응답을 보냄
-     - 이후 다른 API 호출 시 header에 authorization 값을 포함하여 요청을 보내면 됨
+     - 로그인 성공 시 JWT를 응답으로 보냄
+     - 이후 다른 API 호출 시 header의 Authorization 값으로 Bearer + ' ' + JWT로 입력하고 요청을 보내면 됨
+     - ex) Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZDg2MGMwMS02MjI5LTQ4ODUtYmQyMi1mZGRjNTQ2NTdkNjYiLCJpYXQiOjE2OTIzMTczNDEsImV4cCI6MTY5MjMyMDk0MX0.-UlGc4CNOS3vVfNCch1_HEkgXvrS4O_nYOYvv4c1oA4
    - 포인트 적립/수정/취소
      - POST /point
-     - Request body의 action 값(ADD, MOD, DELETE)에 따라 포인트 지급, 수정, 취소 처리
+     - Request body의 action 값(ADD, MOD, DELETE)에 따라 포인트 지급, 수정, 취소
    - 특정 회원의 포인트 목록 조회
-     - GET /point/:userId/list
+     - GET /user/:userId/points
    - 특정 회원의 보유 포인트 조회
-     - GET /point/:userId/total
+     - GET /user/:userId/total-point
 
 ### 기타
 
