@@ -4,7 +4,7 @@ import { AuthService } from '../../auth/service/AuthService';
 import { PermissionService } from '../../user/service/PermissionService';
 import { PointService } from '../service/PointService';
 
-export class PointRoute {
+export class PointController {
   private router;
   constructor(
     private pointService: PointService,

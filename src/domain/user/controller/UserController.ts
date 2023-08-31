@@ -4,7 +4,7 @@ import { AuthService } from '../../auth/service/AuthService';
 import { PermissionService } from '../service/PermissionService';
 import { UserService } from '../service/UserService';
 
-export class UserRoute {
+export class UserController {
   private router;
   constructor(
     private userService: UserService,
