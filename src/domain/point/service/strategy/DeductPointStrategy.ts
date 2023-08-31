@@ -1,13 +1,14 @@
 import { randomUUID } from 'crypto';
-import { Context } from '../../../context';
-import { DeductPointRequest } from '../dto/DeductPointRequest';
-import { Point, PointSourceType, PointType } from '../entity/Point';
-import { PointRepository } from '../repository/interface/PointRepository';
+import { Context } from '../../../../context';
+import { PointRequest } from '../../dto/PointRequest';
+import { Point, PointSourceType, PointType } from '../../entity/Point';
+import { PointRepository } from '../../repository/interface/PointRepository';
+import { PointServiceStrategy } from './PointServiceStrategy';
 
-export class PointDeductService {
+export class DeductPointStrategy implements PointServiceStrategy {
   constructor(private pointRepository: PointRepository) {}
 
-  async deductPoint(ctx: Context, request: DeductPointRequest) {
+  async execute(ctx: Context, request: PointRequest) {
     const userPoints = await this.pointRepository.findByUserId(ctx, request.userId);
     const totalRemainingPoints = userPoints.reduce(
       (acc, point) => (point.type === PointType.ISSUANCE ? acc + point.amount : acc - point.amount),

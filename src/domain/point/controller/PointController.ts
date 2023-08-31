@@ -1,4 +1,5 @@
 import express from 'express';
+import { PointStrategyMap } from '../../../container';
 import { PermissionDeniedError } from '../../../error/errors';
 import { AuthService } from '../../auth/service/AuthService';
 import { PermissionService } from '../../user/service/PermissionService';
@@ -10,6 +11,7 @@ export class PointController {
     private pointService: PointService,
     private authService: AuthService,
     private permissionService: PermissionService,
+    private pointStrategyMap: PointStrategyMap,
   ) {
     this.router = express.Router();
 
@@ -24,25 +26,28 @@ export class PointController {
         }
         await this.permissionService.mustBeAdmin(context, userId);
 
-        let result = false;
+        /**
+         * ADD: 포인트 지급
+         * MOD: 포인트 수정
+         * DELETE: 포인트 취소
+         */
         switch (req.body.action) {
           case 'ADD':
-            // 포인트 지급
-            await this.pointService.createPoint(context, body);
+            this.pointService.setStrategy(this.pointStrategyMap.createPointStrategy);
             break;
           case 'MOD':
-            // 포인트 수정
-            await this.pointService.updatePoint(context, body);
+            this.pointService.setStrategy(this.pointStrategyMap.updatePointStrategy);
             break;
           case 'DELETE':
-            // 포인트 취소
-            await this.pointService.deductPoint(context, body);
+            this.pointService.setStrategy(this.pointStrategyMap.deductPointStrategy);
             break;
           default:
             throw new Error('invalid action');
         }
 
-        res.status(200).json({ success: result });
+        await this.pointService.execute(context, body);
+
+        res.status(200).json({ success: true });
       } catch (error) {
         next(error);
       }

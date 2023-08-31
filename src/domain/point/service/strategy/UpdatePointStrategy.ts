@@ -1,14 +1,15 @@
 import { randomUUID } from 'crypto';
-import { Context } from '../../../context';
-import { ReviewRepository } from '../../review/repository/interface/ReviewRepository';
-import { UpdatePointRequest } from '../dto/UpdatePointRequest';
-import { Point, PointSourceType, PointType } from '../entity/Point';
-import { PointRepository } from '../repository/interface/PointRepository';
+import { Context } from '../../../../context';
+import { ReviewRepository } from '../../../review/repository/interface/ReviewRepository';
+import { PointRequest } from '../../dto/PointRequest';
+import { Point, PointSourceType, PointType } from '../../entity/Point';
+import { PointRepository } from '../../repository/interface/PointRepository';
+import { PointServiceStrategy } from './PointServiceStrategy';
 
-export class PointUpdateService {
+export class UpdatePointStrategy implements PointServiceStrategy {
   constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
 
-  async updatePoint(ctx: Context, req: UpdatePointRequest) {
+  async execute(ctx: Context, req: PointRequest) {
     const reviewPoints = await this.pointRepository.findByReviewId(ctx, req.reviewId);
     if (reviewPoints.length === 0) {
       throw new Error(`리뷰 포인트가 존재하지 않습니다. reviewId: ${req.reviewId}`);

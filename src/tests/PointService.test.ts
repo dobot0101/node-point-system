@@ -4,7 +4,7 @@ import { Container } from '../container';
 import { Context } from '../context';
 import { getTypeOrmDataSource } from '../db';
 import { Place } from '../domain/place/entity/Place';
-import { PointType } from '../domain/point/entity/Point';
+import { Point, PointType } from '../domain/point/entity/Point';
 import { Review } from '../domain/review/entity/Review';
 import { ReviewPhoto } from '../domain/review/entity/ReviewPhoto';
 import { User } from '../domain/user/entity/User';
@@ -20,12 +20,15 @@ describe('PointService 테스트', () => {
       const { adminUser, savedPlace, savedReview } = await createReview(em);
       await createPoints(container, ctx, savedReview, adminUser, savedPlace);
 
-      await container.pointDeductService.deductPoint(ctx, {
+      const { pointService, userService } = container;
+
+      pointService.setStrategy(container.pointStrategyMap.deductPointStrategy);
+      await pointService.execute(ctx, {
         reviewId: savedReview.id,
         userId: adminUser.id,
       });
 
-      const point = await container.userService.getTotalPointByUserId(ctx, adminUser.id);
+      const point = await userService.getTotalPointByUserId(ctx, adminUser.id);
       expect(point).toStrictEqual(0);
     });
   });
@@ -39,7 +42,9 @@ describe('PointService 테스트', () => {
       savedReview.photos = [];
       await em.getRepository(Review).save(savedReview);
 
-      await container.pointUpdateService.updatePoint(ctx, {
+      const { pointService } = container;
+      pointService.setStrategy(container.pointStrategyMap.updatePointStrategy);
+      await pointService.execute(ctx, {
         reviewId: savedReview.id,
         userId: adminUser.id,
       });
@@ -64,6 +69,8 @@ describe('PointService 테스트', () => {
       const em = getTypeOrmDataSource(ctx);
       const { adminUser, savedPlace, savedReview } = await createReview(em);
       const points = await createPoints(container, ctx, savedReview, adminUser, savedPlace);
+      if (!points || points) {
+      }
 
       expect(points.length).toEqual(3);
     });
@@ -77,11 +84,14 @@ async function createPoints(
   adminUser: User,
   savedPlace: Place,
 ) {
-  return await container.pointService.createPoint(ctx, {
+  const { pointService, pointStrategyMap } = container;
+  pointService.setStrategy(pointStrategyMap.createPointStrategy);
+  const createdPoints = (await pointService.execute(ctx, {
     reviewId: savedReview.id,
     userId: adminUser.id,
     placeId: savedPlace.id,
-  });
+  })) as Point[];
+  return createdPoints;
 }
 
 async function createReview(em: EntityManager | DataSource) {

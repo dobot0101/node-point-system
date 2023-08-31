@@ -1,6 +1,6 @@
 import { IsUUID } from 'class-validator';
 
-export class CreatePointRequest {
+export class PointRequest {
   @IsUUID()
   userId!: string;
 

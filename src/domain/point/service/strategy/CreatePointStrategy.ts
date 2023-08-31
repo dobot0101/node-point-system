@@ -1,20 +1,14 @@
 import { randomUUID } from 'crypto';
-import { Context } from '../../../context';
-import { ReviewRepository } from '../../review/repository/interface/ReviewRepository';
-import { CreatePointRequest } from '../dto/CreatePointRequest';
-import { Point, PointSourceType, PointType } from '../entity/Point';
-import { PointRepository } from '../repository/interface/PointRepository';
+import { Context } from '../../../../context';
+import { ReviewRepository } from '../../../review/repository/interface/ReviewRepository';
+import { PointRequest } from '../../dto/PointRequest';
+import { Point, PointSourceType, PointType } from '../../entity/Point';
+import { PointRepository } from '../../repository/interface/PointRepository';
+import { PointServiceStrategy } from './PointServiceStrategy';
 
-type CreatePointInstanceInput = {
-  reviewId: string;
-  userId: string;
-  sourceType: PointSourceType;
-};
-
-export class PointCreateService {
+export class CreatePointStrategy implements PointServiceStrategy {
   constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
-
-  async createPoint(ctx: Context, request: CreatePointRequest): Promise<Point[]> {
+  async execute(ctx: Context, request: PointRequest): Promise<void | Point[]> {
     await this.checkDuplicatePoint(ctx, request.reviewId);
 
     const { reviewId, userId } = request;
@@ -82,3 +76,9 @@ export class PointCreateService {
     });
   }
 }
+
+type CreatePointInstanceInput = {
+  reviewId: string;
+  userId: string;
+  sourceType: PointSourceType;
+};
