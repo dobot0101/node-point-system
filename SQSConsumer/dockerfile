@@ -2,7 +2,7 @@
 FROM node:18-alpine
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /app/SQSConsumer
 
 # Copy the package.json and package-lock.json files
 COPY package.json package-lock.json ./

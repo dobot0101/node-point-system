@@ -1,0 +1,45 @@
+{
+  "name": "node-point-system",
+  "version": "1.0.0",
+  "description": "Implemnetation about point system",
+  "main": "app.js",
+  "scripts": {
+    "test:detect": "jest --forceExit --detectOpenHandles",
+    "test:w": "npx jest --watch",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "test:opt": "jest --forceExit --runInBand --coverage",
+    "test": "jest --forceExit",
+    "test:d": "docker compose exec node-app npm test",
+    "dev": "tsc --watch --preserveWatchOutput & nodemon --enable-source-maps -w dist/ --delay 500ms dist/app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1449.0",
+    "bcrypt": "^5.1.0",
+    "class-validator": "^0.14.0",
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.0",
+    "pg": "^8.11.2",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.3.17",
+    "typeorm-naming-strategies": "^4.1.0",
+    "uuid4": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.2",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/node": "^20.3.1",
+    "@types/uuid4": "^2.0.0",
+    "jest": "^29.5.0",
+    "nodemon": "^2.0.22",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
+  }
+}

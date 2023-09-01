@@ -1,18 +1,35 @@
 version: '3.9'
 
 services:
-  node-app:
-    container_name: node-app
+  point-service:
+    container_name: point-service
     build:
-      context: .
+      context: ./PointService
       dockerfile: Dockerfile
     ports:
       - 3000:3000
+    env_file:
+      - ./env/.env
     depends_on:
       - db
     restart: always
     volumes:
-      - ./src:/app/src
+      # - ./src:/app/src
+      - ./PointService/src:/app/PointService/src
+  sqs-consumer:
+    container_name: sqs-consumer
+    build:
+      context: ./SQSConsumer
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    env_file:
+      - ./env/.env
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - ./SQSConsumer/src:/app/SQSConsumer/src
 
   # db:
   #   image: mysql:5.7
