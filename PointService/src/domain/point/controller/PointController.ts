@@ -45,7 +45,11 @@ export class PointController {
             throw new Error('invalid action');
         }
 
-        await this.pointService.execute(context, body);
+        await this.pointService.execute(context, {
+          userId,
+          reviewId: body.reviewId,
+          placeId: body.placeId,
+        });
 
         res.status(200).json({ success: true });
       } catch (error) {

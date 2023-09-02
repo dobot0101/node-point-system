@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Context } from '../../../../context';
+import { AwsClient } from '../../../aws/AwsClient';
 import { ReviewRepository } from '../../../review/repository/interface/ReviewRepository';
 import { PointRequest } from '../../dto/PointRequest';
 import { Point, PointSourceType, PointType } from '../../entity/Point';
@@ -7,14 +8,15 @@ import { PointRepository } from '../../repository/interface/PointRepository';
 import { PointServiceStrategy } from './PointServiceStrategy';
 
 export class CreatePointStrategy implements PointServiceStrategy {
-  constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
+  constructor(
+    private pointRepository: PointRepository,
+    private reviewRepository: ReviewRepository,
+    private awsClient: AwsClient,
+  ) {}
   async execute(ctx: Context, request: PointRequest): Promise<void | Point[]> {
     await this.checkDuplicatePoint(ctx, request.reviewId);
-
     const { reviewId, userId } = request;
-
     const points = [];
-
     points.push(
       this.createPointInstance({
         reviewId,
@@ -52,8 +54,9 @@ export class CreatePointStrategy implements PointServiceStrategy {
       }
     }
 
-    await this.pointRepository.save(ctx, ...points);
-
+    // await this.pointRepository.save(ctx, ...points);
+    const messageBodys = points.map((point) => JSON.stringify(point));
+    const responses = await this.awsClient.sendBulkSqsMessage(messageBodys);
     return points;
   }
 

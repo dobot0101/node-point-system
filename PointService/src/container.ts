@@ -2,6 +2,7 @@ import { configs } from './config';
 import { AuthRoute } from './domain/auth/controller/AuthController';
 import { AuthService } from './domain/auth/service/AuthService';
 import { JwtService } from './domain/auth/service/JwtService';
+import { AwsClient } from './domain/aws/AwsClient';
 import { PointController } from './domain/point/controller/PointController';
 import { PointRepositoryImpl } from './domain/point/repository/PointRepositoryImpl';
 import { PointService } from './domain/point/service/PointService';
@@ -27,9 +28,12 @@ export class Container {
   public reviewRepositoryImpl = new ReviewRepositoryImpl();
   public userRepositoryImpl = new UserRepositoryImpl();
 
+  // client
+  public awsClient = new AwsClient();
+
   // strategy
   public pointStrategyMap: PointStrategyMap = {
-    createPointStrategy: new CreatePointStrategy(this.pointRepositoryImpl, this.reviewRepositoryImpl),
+    createPointStrategy: new CreatePointStrategy(this.pointRepositoryImpl, this.reviewRepositoryImpl, this.awsClient),
     updatePointStrategy: new UpdatePointStrategy(this.pointRepositoryImpl, this.reviewRepositoryImpl),
     deductPointStrategy: new DeductPointStrategy(this.pointRepositoryImpl),
   };
