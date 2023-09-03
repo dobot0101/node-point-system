@@ -1,12 +1,13 @@
 import { randomUUID } from 'crypto';
 import { Context } from '../../../../context';
+import { AwsClient } from '../../../aws/AwsClient';
 import { PointRequest } from '../../dto/PointRequest';
 import { Point, PointSourceType, PointType } from '../../entity/Point';
 import { PointRepository } from '../../repository/interface/PointRepository';
 import { PointServiceStrategy } from './PointServiceStrategy';
 
 export class DeductPointStrategy implements PointServiceStrategy {
-  constructor(private pointRepository: PointRepository) {}
+  constructor(private pointRepository: PointRepository, private awsClient: AwsClient) {}
 
   async execute(ctx: Context, request: PointRequest) {
     const userPoints = await this.pointRepository.findByUserId(ctx, request.userId);
@@ -37,8 +38,7 @@ export class DeductPointStrategy implements PointServiceStrategy {
       createdAt: new Date(),
     });
 
-    await this.pointRepository.save(ctx, point);
-
-    return point;
+    const responses = await this.awsClient.sendSqsMessage(JSON.stringify(point));
+    return [point];
   }
 }

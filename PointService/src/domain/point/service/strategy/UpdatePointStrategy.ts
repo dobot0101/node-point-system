@@ -5,9 +5,14 @@ import { PointRequest } from '../../dto/PointRequest';
 import { Point, PointSourceType, PointType } from '../../entity/Point';
 import { PointRepository } from '../../repository/interface/PointRepository';
 import { PointServiceStrategy } from './PointServiceStrategy';
+import { AwsClient } from '../../../aws/AwsClient';
 
 export class UpdatePointStrategy implements PointServiceStrategy {
-  constructor(private pointRepository: PointRepository, private reviewRepository: ReviewRepository) {}
+  constructor(
+    private pointRepository: PointRepository,
+    private reviewRepository: ReviewRepository,
+    private awsClient: AwsClient,
+  ) {}
 
   async execute(ctx: Context, req: PointRequest) {
     const reviewPoints = await this.pointRepository.findByReviewId(ctx, req.reviewId);
@@ -99,6 +104,9 @@ export class UpdatePointStrategy implements PointServiceStrategy {
       }
     }
 
-    await this.pointRepository.save(ctx, ...pointsToSave);
+    // await this.pointRepository.save(ctx, ...pointsToSave);
+    const messageBodys = pointsToSave.map((point) => JSON.stringify(point));
+    const responses = await this.awsClient.sendBulkSqsMessage(messageBodys);
+    return pointsToSave;
   }
 }

@@ -13,7 +13,7 @@ export class CreatePointStrategy implements PointServiceStrategy {
     private reviewRepository: ReviewRepository,
     private awsClient: AwsClient,
   ) {}
-  async execute(ctx: Context, request: PointRequest): Promise<void | Point[]> {
+  async execute(ctx: Context, request: PointRequest) {
     await this.checkDuplicatePoint(ctx, request.reviewId);
     const { reviewId, userId } = request;
     const points = [];
@@ -54,7 +54,6 @@ export class CreatePointStrategy implements PointServiceStrategy {
       }
     }
 
-    // await this.pointRepository.save(ctx, ...points);
     const messageBodys = points.map((point) => JSON.stringify(point));
     const responses = await this.awsClient.sendBulkSqsMessage(messageBodys);
     return points;

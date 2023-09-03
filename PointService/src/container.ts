@@ -34,8 +34,8 @@ export class Container {
   // strategy
   public pointStrategyMap: PointStrategyMap = {
     createPointStrategy: new CreatePointStrategy(this.pointRepositoryImpl, this.reviewRepositoryImpl, this.awsClient),
-    updatePointStrategy: new UpdatePointStrategy(this.pointRepositoryImpl, this.reviewRepositoryImpl),
-    deductPointStrategy: new DeductPointStrategy(this.pointRepositoryImpl),
+    updatePointStrategy: new UpdatePointStrategy(this.pointRepositoryImpl, this.reviewRepositoryImpl, this.awsClient),
+    deductPointStrategy: new DeductPointStrategy(this.pointRepositoryImpl, this.awsClient),
   };
 
   // service

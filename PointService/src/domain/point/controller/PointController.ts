@@ -1,8 +1,11 @@
+import { validate } from 'class-validator';
 import express from 'express';
 import { PointStrategyMap } from '../../../container';
-import { PermissionDeniedError } from '../../../error/errors';
+import { BadRequestError, PermissionDeniedError } from '../../../error/errors';
+import { getErrorMessageFromValidationErrors } from '../../../error/functions';
 import { AuthService } from '../../auth/service/AuthService';
 import { PermissionService } from '../../user/service/PermissionService';
+import { PointRequest } from '../dto/PointRequest';
 import { PointService } from '../service/PointService';
 
 export class PointController {
@@ -25,6 +28,16 @@ export class PointController {
           throw new PermissionDeniedError();
         }
         await this.permissionService.mustBeAdmin(context, userId);
+        const pointRequest = new PointRequest();
+        pointRequest.userId = userId;
+        pointRequest.reviewId = body.reviewId;
+        pointRequest.placeId = body.placeId;
+        pointRequest.action = body.action;
+
+        const errors = await validate(pointRequest);
+        if (errors.length > 0) {
+          throw new BadRequestError(getErrorMessageFromValidationErrors(errors));
+        }
 
         /**
          * ADD: 포인트 지급
@@ -45,11 +58,7 @@ export class PointController {
             throw new Error('invalid action');
         }
 
-        await this.pointService.execute(context, {
-          userId,
-          reviewId: body.reviewId,
-          placeId: body.placeId,
-        });
+        await this.pointService.execute(context, pointRequest);
 
         res.status(200).json({ success: true });
       } catch (error) {

@@ -26,6 +26,7 @@ describe('PointService 테스트', () => {
       await pointService.execute(ctx, {
         reviewId: savedReview.id,
         userId: adminUser.id,
+        action: 'DELETE',
       });
 
       const point = await userService.getTotalPointByUserId(ctx, adminUser.id);
@@ -47,6 +48,7 @@ describe('PointService 테스트', () => {
       await pointService.execute(ctx, {
         reviewId: savedReview.id,
         userId: adminUser.id,
+        action: 'MOD',
       });
 
       const points = await container.pointRepositoryImpl.findByReviewId(ctx, savedReview.id);
@@ -90,6 +92,7 @@ async function createPoints(
     reviewId: savedReview.id,
     userId: adminUser.id,
     placeId: savedPlace.id,
+    action: 'ADD',
   })) as Point[];
   return createdPoints;
 }
